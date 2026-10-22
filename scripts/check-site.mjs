@@ -56,7 +56,9 @@ for (const svg of files.filter((f) => f.endsWith(".svg"))) {
 const docs = JSON.parse(readFileSync(join(root, "data/docs.json"), "utf8"));
 for (const repo of docs.repos) for (const page of repo.pages) if (!fileFor(page.url)) problems.push(`docs page missing from the build: ${page.url}`);
 const llms = readFileSync(join(pub, "llms.txt"), "utf8");
-const llmsLinks = [...llms.matchAll(/\]\((https:\/\/grandstack\.ai[^)]*)\)/g)].map((m) => new URL(m[1]).pathname);
+const baseUrl = readFileSync(join(root, "hugo.toml"), "utf8").match(/baseURL\s*=\s*"([^"]+)"/)[1].replace(/\/$/, "");
+const escaped = baseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const llmsLinks = [...llms.matchAll(new RegExp(`\\]\\((${escaped}[^)]*)\\)`, "g"))].map((m) => new URL(m[1]).pathname);
 for (const p of llmsLinks) if (!fileFor(p) && !existsSync(join(pub, p))) problems.push(`llms.txt links to a page that does not exist: ${p}`);
 const docPages = docs.repos.flatMap((r) => r.pages.map((p) => p.url));
 for (const url of docPages) if (!llmsLinks.includes(url)) problems.push(`llms.txt does not list ${url}`);

@@ -1,6 +1,6 @@
 # grand-stack.github.io
 
-The website for GRANDstack, published at **https://grandstack.ai**. A [Hugo](https://gohugo.io) site with its own hand-written theme: no third-party theme, no JavaScript framework, no external requests. Fonts (Public Sans, Fira Code) are bundled.
+The website for GRANDstack, published at **https://www.grandstack.ai**. A [Hugo](https://gohugo.io) site with its own hand-written theme: no third-party theme, no JavaScript framework, no external requests. Fonts (Public Sans, Fira Code) are bundled.
 
 The site holds only the website. The documentation pages are a **generated copy** of the docs in the other repositories, which stay the source of truth.
 
@@ -47,11 +47,11 @@ node scripts/verify-examples.mjs --stack default --write      # also: agents, fe
 | `content/quickstart.md`, `content/agents.md` | Hand-written pages |
 | `content/docs/` | Generated copy |
 | `scripts/` | `sync-docs.mjs`, `check-site.mjs`, `verify-examples.mjs` |
-| `static/` | Fonts, favicon, `CNAME` (grandstack.ai), generated diagrams |
+| `static/` | Fonts, favicon, `CNAME` (www.grandstack.ai), generated diagrams |
 
 ## Deployment
 
-`.github/workflows/pages.yml` builds with Hugo 0.164 and deploys to GitHub Pages on every push to `main`. In the repository settings, set Pages to **GitHub Actions** and the custom domain to `grandstack.ai`; the `CNAME` file is in `static/`. The workflow has not been run from here.
+`.github/workflows/pages.yml` builds with Hugo 0.164 and deploys to GitHub Pages on every push to `main`. In the repository settings, set Pages to **GitHub Actions** and the custom domain to `www.grandstack.ai`; the `CNAME` file is in `static/`. The workflow has not been run from here.
 
 ## Licence
 

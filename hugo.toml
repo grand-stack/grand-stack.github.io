@@ -1,6 +1,6 @@
 # Copyright (c) "Neo4j"
 # Neo4j Sweden AB [http://neo4j.com]
-baseURL = "https://grandstack.ai/"
+baseURL = "https://www.grandstack.ai/"
 locale = "en"
 title = "GRANDstack"
 enableRobotsTXT = true

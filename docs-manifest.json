@@ -33,10 +33,6 @@
           "slug": "agents-md"
         },
         {
-          "file": "docs/roadmap.md",
-          "section": "Project"
-        },
-        {
           "file": "docs/versioning-and-releases.md",
           "section": "Project"
         }
@@ -290,9 +286,5 @@
         }
       ]
     }
-  ],
-  "roadmap": {
-    "repo": "grandstack",
-    "file": "docs/roadmap.md"
-  }
+  ]
 }

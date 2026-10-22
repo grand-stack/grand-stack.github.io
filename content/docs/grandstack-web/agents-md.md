@@ -28,6 +28,7 @@ React + Vite client for grandstack-server: faceted movie and people search, comp
 - `VITE_GRAPHQL_URL` is fixed at build time and must be reachable from the browser. The compare tray is hidden on form pages on purpose.
 - No authentication: edit screens show a banner and deletes ask for confirmation. Do not expose the app publicly.
 - Keep `graphql` on 16.x to match the server. Pin exact dependency versions.
+- New code files need the copyright header (two lines: `Copyright (c) "Neo4j"` and `Neo4j Sweden AB [http://neo4j.com]`, in the file's comment syntax). Run `node ../grandstack/scripts/add-headers.mjs` to add it everywhere; `--check` lists what is missing. Generated files are exempt.
 
 ## Keep the docs true
 When you change behaviour, update the matching doc in the same change (routes and folder map in `docs/architecture.md`, feature behaviour in `docs/features.md`, new gotchas here or in `docs/testing.md`). `npm run docs:check` fails on a broken relative link. Diagrams are SVG files in `docs/diagrams/`: edit the SVG and its numbered legend together when behaviour changes; `npm run docs:check` fails on a missing alt text, unsafe SVG content, or legend numbers that do not match the callouts drawn.

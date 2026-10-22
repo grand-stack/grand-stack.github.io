@@ -105,12 +105,12 @@ Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (t
 | [Agent guide](/docs/grandstack/agents/) | For coding agents: where to change what, checks, gotchas |
 | [Configuration](/docs/grandstack/configuration/) | Services, ports, settings (including the auth setup), Podman, resetting data |
 | [Versioning and releases](/docs/grandstack/versioning-and-releases/) | Tags, what is released, how to cut a release |
-| [Roadmap](/docs/grandstack/roadmap/) | What is built and what is planned |
+| [Roadmap](https://github.com/grand-stack/grandstack/blob/main/docs/roadmap.md) | What is built and what is planned |
 | [llms.txt](https://github.com/grand-stack/grandstack/blob/main/llms.txt) | An index of all of this for agents (the public copy is https://grandstack.ai/llms.txt) |
 
 The sample data has real titles, casts and relationships; ratings and runtimes are approximate.
 
-Last verified: grandstack v0.10.1 with grandstack-server v0.9.1, grandstack-web v0.5.2, grandstack-auth v0.1.2, grandstack-agents v0.1.3, grandstack-federation v0.1.2 and the website grand-stack.github.io v0.1.1, Neo4j 2026.10 community, under Podman 6 on macOS. The latest patch tags of the repositories only add LICENSE and NOTICE files and docs since each was last fully tested.
+Last verified: grandstack v0.10.2 with grandstack-server v0.9.2, grandstack-web v0.5.3, grandstack-auth v0.1.3, grandstack-agents v0.1.4, grandstack-federation v0.1.3 and the website grand-stack.github.io v0.1.2, Neo4j 2026.10 community, under Podman 6 on macOS. The tests, builds and the federation and auth smoke checks were rerun after the copyright headers were added.
 
 ## Licence
 

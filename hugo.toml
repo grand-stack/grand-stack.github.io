@@ -1,3 +1,5 @@
+# Copyright (c) "Neo4j"
+# Neo4j Sweden AB [http://neo4j.com]
 baseURL = "https://grandstack.ai/"
 locale = "en"
 title = "GRANDstack"
@@ -6,7 +8,7 @@ disableKinds = ["taxonomy", "term"]
 enableGitInfo = false
 
 [params]
-  description = "GraphQL on Neo4j, for developers and agents."
+  description = "GraphQL and Neo4j, for developers and agents."
   githubOrg = "grand-stack"
 
 [markup]
@@ -55,7 +57,3 @@ enableGitInfo = false
     name = "Agents"
     url = "/agents/"
     weight = 40
-  [[menus.main]]
-    name = "Roadmap"
-    url = "/roadmap/"
-    weight = 50

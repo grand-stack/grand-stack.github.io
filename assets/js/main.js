@@ -1,3 +1,5 @@
+// Copyright (c) "Neo4j"
+// Neo4j Sweden AB [http://neo4j.com]
 // Theme toggle, copy buttons, install tabs, example filters, mobile docs menu. No dependencies.
 (function () {
   var root = document.documentElement;

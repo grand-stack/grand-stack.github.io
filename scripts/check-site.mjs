@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Copyright (c) "Neo4j"
+// Neo4j Sweden AB [http://neo4j.com]
 // Checks the BUILT site (run `npm run build` first): internal links and anchors, image alt text, no external scripts or fonts,
 // SVG safety, every documented page present, every llms.txt link real. Dependency free.
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";

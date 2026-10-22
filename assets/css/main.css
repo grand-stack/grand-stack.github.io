@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) "Neo4j"
+ * Neo4j Sweden AB [http://neo4j.com]
+ */
 /* GRANDstack site. The look follows https://neo4j.sh (palette and type); no files are copied from it.
    Fonts: Public Sans and Fira Code, SIL OFL 1.1 (static/fonts). Licensed Apache-2.0 like the rest of the project. */
 @font-face { font-family: "Public Sans"; font-weight: 400; font-display: swap; src: url("/fonts/public-sans-latin-400-normal.woff2") format("woff2"); }

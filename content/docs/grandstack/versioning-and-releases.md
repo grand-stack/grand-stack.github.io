@@ -1,7 +1,7 @@
 ---
 title: "Versioning and releases"
 description: "Every repository uses semantic versions as git tags (v0.6.0). A change that adds behaviour bumps the minor version while we are below 1.0; a fix or a docs-only change..."
-weight: 8
+weight: 7
 repo: "grandstack"
 section: "Project"
 source: "docs/versioning-and-releases.md"
@@ -18,20 +18,20 @@ Every repository uses **semantic versions as git tags** (`v0.6.0`). A change tha
 
 | Repository | Latest tag | Notes |
 | --- | --- | --- |
-| `grandstack-server` | `v0.9.1` | v0.9.1: LICENSE and NOTICE. v0.9.0: `FEDERATION` setting (federation subgraph), `@apollo/subgraph` pinned to 2.14.4. v0.7.1: annotated diagrams (docs only). v0.7.0 added the generic auth settings (`AUTH_*`, `SCHEMA_EXTRA_PATHS`, `SETUP_CYPHER_PATHS`); earlier: `SEED_PROBE_LABEL`, `REFRESH_COUNTS`, schema reference generator, docs |
-| `grandstack-web` | `v0.5.2` | v0.5.2: LICENSE and NOTICE. v0.5.1: annotated diagrams (docs only). v0.5.0: Docs, shared `hash` and `initials` helpers, browser end-to-end script |
-| `grandstack-auth` | `v0.1.2` | v0.1.2: LICENSE and NOTICE. v0.1.1: annotated diagrams (docs only). v0.1.0: gateway, Keycloak dev realm, auth schema rules, demo client, smoke and browser tests, the exercise and its reference patch (made against `grandstack-web` v0.5.0) |
-| `grand-stack.github.io` | `v0.1.1` | v0.1.1: fixes after cold reads (diagram links, checker, quickstart, README). v0.1.0: | The website (https://grandstack.ai): hand-written Hugo theme, a generated copy of every repo's docs, examples verified against real stacks, llms.txt and llms-full.txt, Apache-2.0 |
-| `grandstack-federation` | `v0.1.2` | v0.1.2: LICENSE and NOTICE. v0.1.1 and earlier: | v0.1.1: docs fixes after cold reads. v0.1.0: Wikipedia subgraph, gateway config and supergraph, link builder and committed links, smoke script, docs and diagrams |
-| `grandstack-agents` | `v0.1.3` | v0.1.3: LICENSE and NOTICE. v0.1.2 and earlier: | v0.1.2: `@cypher` in the schema design docs. v0.1.1: docs on schema design for agents. v0.1.0: MCP server (stdio and streamable HTTP) with generic GraphQL tools, read-only by default; direct agent-loop example; auth example code; docs and diagrams; Dockerfile |
-| `grandstack` | `v0.10.1` | v0.10.1: docs refresh (README versions, roadmap row). v0.10.0: LICENSE (Apache-2.0) and NOTICE in every repo, roadmap (phase 7 done), pointers to the website. v0.9.1: versions table. v0.9.0: `compose.federation.yaml`, roadmap (phase 6 done, site is phase 7), docs. v0.8.2: table update. v0.8.1: docs pointers to schema design for agents. v0.8.0: `compose.agents.yaml` (opt-in agents MCP server), roadmap re-cut, docs. v0.7.1: annotated diagrams. v0.7.0: `compose.auth.yaml` (opt-in auth), docs |
+| `grandstack-server` | `v0.9.2` | v0.9.2: copyright headers on code files. v0.9.1: LICENSE and NOTICE. v0.9.0: `FEDERATION` setting (federation subgraph), `@apollo/subgraph` pinned to 2.14.4. v0.7.1: annotated diagrams (docs only). v0.7.0 added the generic auth settings (`AUTH_*`, `SCHEMA_EXTRA_PATHS`, `SETUP_CYPHER_PATHS`); earlier: `SEED_PROBE_LABEL`, `REFRESH_COUNTS`, schema reference generator, docs |
+| `grandstack-web` | `v0.5.3` | v0.5.3: copyright headers on code files. v0.5.2: LICENSE and NOTICE. v0.5.1: annotated diagrams (docs only). v0.5.0: Docs, shared `hash` and `initials` helpers, browser end-to-end script |
+| `grandstack-auth` | `v0.1.3` | v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1: annotated diagrams (docs only). v0.1.0: gateway, Keycloak dev realm, auth schema rules, demo client, smoke and browser tests, the exercise and its reference patch (made against `grandstack-web` v0.5.0) |
+| `grand-stack.github.io` | `v0.1.2` | v0.1.2: title "GraphQL and Neo4j", roadmap page removed from the site, copyright headers. v0.1.1: fixes after cold reads (diagram links, checker, quickstart, README). v0.1.0: | The website (https://grandstack.ai): hand-written Hugo theme, a generated copy of every repo's docs, examples verified against real stacks, llms.txt and llms-full.txt, Apache-2.0 |
+| `grandstack-federation` | `v0.1.3` | v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1 and earlier: | v0.1.1: docs fixes after cold reads. v0.1.0: Wikipedia subgraph, gateway config and supergraph, link builder and committed links, smoke script, docs and diagrams |
+| `grandstack-agents` | `v0.1.4` | v0.1.4: copyright headers on code files. v0.1.3: LICENSE and NOTICE. v0.1.2 and earlier: | v0.1.2: `@cypher` in the schema design docs. v0.1.1: docs on schema design for agents. v0.1.0: MCP server (stdio and streamable HTTP) with generic GraphQL tools, read-only by default; direct agent-loop example; auth example code; docs and diagrams; Dockerfile |
+| `grandstack` | `v0.10.2` | v0.10.2: copyright headers on code files (`scripts/add-headers.mjs`), NOTICE copyright is Neo4j. v0.10.1: docs refresh (README versions, roadmap row). v0.10.0: LICENSE (Apache-2.0) and NOTICE in every repo, roadmap (phase 7 done), pointers to the website. v0.9.1: versions table. v0.9.0: `compose.federation.yaml`, roadmap (phase 6 done, site is phase 7), docs. v0.8.2: table update. v0.8.1: docs pointers to schema design for agents. v0.8.0: `compose.agents.yaml` (opt-in agents MCP server), roadmap re-cut, docs. v0.7.1: annotated diagrams. v0.7.0: `compose.auth.yaml` (opt-in auth), docs |
 
 The versions that were tested together are the ones in this table. All tags are **local so far**: nothing is pushed or published, and no images are in a registry.
 
 ## How the umbrella pins versions (today and planned)
 
 - **Today**, `compose.yaml` builds the server and web images from the sibling checkouts (`build: ../grandstack-server`). To get a known-good combination, check out the tags in the table in each repo.
-- **Planned:** once images are published, `compose.yaml` will reference image tags (for example `grandstack-server:0.6.0`), and the umbrella's own tag will name the set. That change is on the [roadmap](/docs/grandstack/roadmap/).
+- **Planned:** once images are published, `compose.yaml` will reference image tags (for example `grandstack-server:0.6.0`), and the umbrella's own tag will name the set. That change is on the [roadmap](https://github.com/grand-stack/grandstack/blob/main/docs/roadmap.md).
 
 ## Cutting a release (per repo)
 

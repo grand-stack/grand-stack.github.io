@@ -23,9 +23,9 @@ npm run sync                # copies docs and diagrams, rewrites links, refreshe
 npm run sync:check          # exits 1 if the copy is out of date (skips if the repos are not there)
 ```
 
-The sync only writes inside this repo (`content/docs/`, `content/roadmap.md`, `static/diagrams/`, `data/`); it never changes the other repos. It finds them through `"workspace": ".."` in the manifest (so they must sit beside this one), and reads version tags from their `.git` folders. Run it **before** `npm run build`; to see the result use `hugo server`, or `npm run build` and `npm run check`.
+The sync only writes inside this repo (`content/docs/`, `static/diagrams/`, `data/`); it never changes the other repos. It finds them through `"workspace": ".."` in the manifest (so they must sit beside this one), and reads version tags from their `.git` folders. Run it **before** `npm run build`; to see the result use `hugo server`, or `npm run build` and `npm run check`.
 
-`docs-manifest.json` says which pages of which repo go where. A new doc does not appear until you add it: in the repo's `pages` list add `{ "file": "docs/your-doc.md", "section": "Guides" }` (optional `"slug"`; the section names are the sidebar headings, and the position in the list is the order). Adding a page renumbers the `weight` of the pages after it, so a few other generated files change too. Start each doc with a one-sentence lead: it becomes the page description. The script turns links between docs into site links, links to files the site does not hold into GitHub links (`https://github.com/grand-stack/<repo>`), and fails (exit 1) on a link to a file that does not exist. It does not check `#anchors`: `npm run check` does that on the built site. `sync:check` exits 1 when the copy is out of date or a link is broken, and exits 0 without doing anything when the repos are not beside this one. Never edit `content/docs/`, `content/roadmap.md`, `static/diagrams/` or `data/docs.json` by hand.
+`docs-manifest.json` says which pages of which repo go where. A new doc does not appear until you add it: in the repo's `pages` list add `{ "file": "docs/your-doc.md", "section": "Guides" }` (optional `"slug"`; the section names are the sidebar headings, and the position in the list is the order). Adding a page renumbers the `weight` of the pages after it, so a few other generated files change too. Start each doc with a one-sentence lead: it becomes the page description. The script turns links between docs into site links, links to files the site does not hold into GitHub links (`https://github.com/grand-stack/<repo>`), and fails (exit 1) on a link to a file that does not exist. It does not check `#anchors`: `npm run check` does that on the built site. `sync:check` exits 1 when the copy is out of date or a link is broken, and exits 0 without doing anything when the repos are not beside this one. Never edit `content/docs/`, `static/diagrams/` or `data/docs.json` by hand.
 
 ## Examples
 
@@ -45,7 +45,7 @@ node scripts/verify-examples.mjs --stack default --write      # also: agents, fe
 | `hugo.toml` | Site settings (`githubOrg`), output formats for `llms.txt` and `llms-full.txt` |
 | `layouts/`, `assets/` | The theme: templates, CSS (light and dark tokens), JavaScript (theme toggle, copy buttons, tabs, filters; about 2 KB) |
 | `content/quickstart.md`, `content/agents.md` | Hand-written pages |
-| `content/docs/`, `content/roadmap.md` | Generated copies |
+| `content/docs/` | Generated copy |
 | `scripts/` | `sync-docs.mjs`, `check-site.mjs`, `verify-examples.mjs` |
 | `static/` | Fonts, favicon, `CNAME` (grandstack.ai), generated diagrams |
 

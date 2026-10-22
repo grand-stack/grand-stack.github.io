@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Copyright (c) "Neo4j"
+// Neo4j Sweden AB [http://neo4j.com]
 // Runs the commands in data/examples.json against a RUNNING stack and checks each result contains its `expect` text.
 //   node scripts/verify-examples.mjs --stack default|agents|federation|auth [--write]
 // --write stores the real output (shortened) in data/examples.json so the page shows what the commands returned.

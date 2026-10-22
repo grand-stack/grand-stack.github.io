@@ -32,12 +32,15 @@ export function compare(latest, known) {
   return { changed: changes.length > 0, changes };
 }
 
-export async function githubTags(org, repo, fetchImpl = fetch, token = process.env.GITHUB_TOKEN) {
+export async function githubTags(org, repo, fetchImpl = fetch, token = process.env.GITHUB_TOKEN, strict = process.env.STRICT_TAGS === "true") {
   const headers = { accept: "application/vnd.github+json", "user-agent": "grandstack-site", ...(token ? { authorization: `Bearer ${token}` } : {}) };
   const names = [];
   for (let page = 1; page <= 5; page++) {
     const res = await fetchImpl(`https://api.github.com/repos/${org}/${repo}/tags?per_page=100&page=${page}`, { headers });
-    if (res.status === 404) return []; // not published yet
+    if (res.status === 404) {
+      if (strict) throw new Error(`${org}/${repo} was not found (HTTP 404): it does not exist yet, or the token cannot see it (a private repository?)`);
+      return []; // not published yet
+    }
     if (!res.ok) throw new Error(`GitHub answered HTTP ${res.status} for ${org}/${repo} tags`);
     const batch = await res.json();
     names.push(...batch.map((t) => t.name));

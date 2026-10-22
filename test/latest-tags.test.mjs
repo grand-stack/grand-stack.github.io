@@ -29,6 +29,7 @@ test("github tags: pagination, a missing repository, and errors", async () => {
   const names = await githubTags("o", "r", fetchImpl, "token");
   assert.equal(names.length, 101);
   assert.equal(calls.length, 2);
-  assert.deepEqual(await githubTags("o", "missing", fetchImpl), []);
+  assert.deepEqual(await githubTags("o", "missing", fetchImpl, undefined, false), []);
+  await assert.rejects(githubTags("o", "missing", fetchImpl, undefined, true), /was not found/);
   await assert.rejects(githubTags("o", "broken", fetchImpl), /HTTP 500/);
 });

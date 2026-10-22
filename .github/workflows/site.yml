@@ -28,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       run: ${{ steps.tags.outputs.run }}
+      ready: ${{ steps.built.outputs.ready }}
     steps:
       - uses: actions/checkout@v4
         with: { path: work/grand-stack.github.io }
@@ -38,6 +39,7 @@ jobs:
         working-directory: work/grand-stack.github.io
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          STRICT_TAGS: "true"
         run: node scripts/latest-tags.mjs
       - name: Nothing new
         if: ${{ steps.tags.outputs.run != 'true' }}
@@ -64,7 +66,7 @@ jobs:
       - name: Install Hugo
         if: ${{ steps.tags.outputs.run == 'true' }}
         run: |
-          curl -sSL -o hugo.tar.gz "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
+          curl -fsSL -o hugo.tar.gz "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
           tar -xzf hugo.tar.gz hugo && sudo mv hugo /usr/local/bin/
           hugo version
       - name: Refresh the docs copy, build, check
@@ -74,8 +76,15 @@ jobs:
           npm run sync
           hugo --gc --minify
           npm run check
-      - name: Commit the refreshed copy to main
+      - uses: actions/upload-pages-artifact@v3
         if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { path: work/grand-stack.github.io/public }
+      - name: Built and ready to deploy
+        id: built
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        run: echo "ready=true" >> "$GITHUB_OUTPUT"
+      - name: Commit the refreshed copy to main (after the artifact is built, so a push problem cannot block the deploy)
+        if: ${{ steps.tags.outputs.run == 'true' && github.ref_name == 'main' }}
         working-directory: work/grand-stack.github.io
         env:
           SUMMARY: ${{ steps.tags.outputs.summary }}
@@ -85,14 +94,13 @@ jobs:
           git add content data static
           if git diff --cached --quiet; then echo "The docs copy is already up to date."; exit 0; fi
           git commit -m "docs: sync from releases${SUMMARY:+ ($SUMMARY)}"
-          # best effort: if main is protected against the bot, say so and still deploy what was built
-          git push origin HEAD:main || echo "::warning::Could not push the refreshed docs copy to main (branch protection?). The site was still built and deployed from it."
-      - uses: actions/upload-pages-artifact@v3
-        if: ${{ steps.tags.outputs.run == 'true' }}
-        with: { path: work/grand-stack.github.io/public }
+          # The site is deployed from the artifact built above even if this fails, but a failed push leaves versions.json stale, which
+          # would make the hourly check rebuild every hour: so fail loudly and fix the branch rules for github-actions[bot].
+          git push origin HEAD:main
   deploy:
     needs: build
-    if: ${{ needs.build.outputs.run == 'true' }}
+    # deploy what was built even if the last step of the build job (pushing the refreshed docs copy) failed
+    if: ${{ !cancelled() && needs.build.outputs.ready == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages

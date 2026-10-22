@@ -27,7 +27,7 @@ Each repository's `ci.yml` runs on pull requests and on pushes to `main`:
 | `grandstack` (this repo), `.github` | the docs link check (`.github`: its script tests and a workflow lint) |
 | `grand-stack.github.io` | the site's unit tests, a build, and the site checks on the committed docs copy |
 
-Every one of them also checks that **every code file has the copyright header**. Running superseded commits is cancelled. CodeQL (JavaScript and TypeScript) runs on pushes, pull requests and weekly, a dependency review blocks pull requests that add a high-severity vulnerability, and Dependabot proposes weekly updates for npm, Docker and Actions. Dependabot is told to leave alone the pins that must hold: `graphql` stays 16.x, `@apollo/subgraph` stays 2.14.4, and the MCP SDK stays on its v1 API.
+Every one of them also checks that **every code file has the copyright header**. A newer push cancels the still-running checks of the one before it. None of these checks blocks a merge until you mark it as required in branch protection or a ruleset. CodeQL (JavaScript and TypeScript) runs on pushes, pull requests and weekly, a dependency review fails pull requests that add a dependency with a high-severity vulnerability (it does not check licences yet), and Dependabot proposes weekly updates for npm, Docker and Actions. Dependabot is told to leave alone the pins that must hold: `graphql` stays 16.x, `@apollo/subgraph` stays 2.14.4, and the MCP SDK stays on its v1 API.
 
 ## Making a release
 
@@ -36,11 +36,11 @@ Versions are semantic (`vMAJOR.MINOR.PATCH`) git tags, and the tag must equal th
 ![What happens on a release](/diagrams/grandstack/release-flow.svg)
 
 1. **The release button.** In the repository's Actions tab, run **release-cut**: choose patch, minor or major (or tick dry-run to see the next version and the change without pushing).
-2. **`cut-release`** checks that CI succeeded on the tip of `main`, works out the next version from the latest tag, sets it in every `package.json` (and lock file), commits `release vX.Y.Z`, tags it and pushes. It then calls the release workflow itself, because a tag pushed with the default token does not start other workflows.
-3. **The release workflow** validates the tag and that all `package.json` versions agree with it. For a hand-pushed tag it also requires a successful `ci.yml` run on that commit. You can start it by pushing a tag yourself (the version must already be committed) or by hand from the Actions tab with a tag and `dry-run`.
+2. **`cut-release`** checks that CI succeeded on the tip of `main`, works out the next version from the latest tag, sets it in every `package.json` (and lock file), commits `release vX.Y.Z`, tags it and pushes. The release-cut workflow then runs the release workflow in the same run, because a tag pushed with the default token does not start other workflows. (The release commit does not get its own CI run for the same reason; the next release checks the commit before it.)
+3. **The release workflow** validates the tag, that it is on `main`, and that all `package.json` versions agree with it. For a hand-pushed tag it also requires a successful `ci.yml` run on that commit. Images are tagged `latest` only when the tag is the highest release. You can start it by pushing a tag yourself (the version must already be committed) or by hand from the Actions tab with a tag and `dry-run`.
 4. **GitHub Release** with generated notes.
-5. **Container images**, built for `linux/amd64` and `linux/arm64` and pushed to `ghcr.io/grand-stack/<image>` with the tags `1.2.3`, `1.2` and `latest`.
-6. **Notify**: a `repo-released` event goes to the website repository and to this repository. If the `SITE_DISPATCH_TOKEN` secret is missing, a notice says so and the website catches up at its next hourly check.
+5. **Container images**, built for `linux/amd64` and `linux/arm64` (the arm64 build is emulated and can take many minutes) and pushed to `ghcr.io/grand-stack/<image>` with the tags `1.2.3`, `1.2` and `latest`.
+6. **Notify**: a `repo-released` event goes to the website repository and to this repository. If the `SITE_DISPATCH_TOKEN` secret is missing, a notice says so, the website catches up at its next hourly check, and the integration test waits for its nightly run.
 7. **The website** (`site.yml`) rebuilds. See below.
 8. **The integration test** runs the four compose setups against the latest `main` of every repository.
 
@@ -63,8 +63,10 @@ This repository (`grandstack`) and `.github` have no images and no `package.json
 1. It asks GitHub for the highest `vX.Y.Z` tag of each of the six documented repositories and compares them with the versions the site was last built from (`data/versions.json`). An hourly run with nothing new stops here.
 2. It checks each repository out **at that tag**, beside the site, so the docs shown are the docs of the released version.
 3. It runs `npm run sync`, `hugo --gc --minify` and the site checks (links, anchors, alt text, `llms.txt`).
-4. If the docs copy changed, it commits it to the site's `main` as `github-actions[bot]` ("docs: sync from releases (...)"). If the branch rules refuse the bot, it warns and still deploys.
-5. It deploys the built site to GitHub Pages.
+4. It uploads the built site, and deploys it to GitHub Pages.
+5. Last, if the docs copy changed, it commits it to the site's `main` as `github-actions[bot]` ("docs: sync from releases (...)"). If the branch rules refuse the bot, this step fails (the site has already been deployed), and the hourly check will keep rebuilding until the push works, so fix the rule for `github-actions[bot]`.
+
+Both the website and the integration test check out the other repositories with the default token, so **the repositories must be public** (or you must give the workflows a token that can read them). A repository the token cannot see makes the site job fail rather than silently use an old copy.
 
 A release of the website repository itself is not needed: it deploys on every push.
 
@@ -95,17 +97,17 @@ The logic is a script, so you can run any setup yourself, beside the other repos
 
 None of this can be done by the workflows themselves.
 
-- Push all repositories and `.github` to `https://github.com/grand-stack`. Make `.github` public (reusable workflows need it), then tag it `v1` (a moving major tag: move it after each compatible change).
+- Push all repositories and `.github` to `https://github.com/grand-stack`. Push `.github` first and make it public: the other repositories' workflows call it at `v1` (a moving major tag you move after each compatible change) and fetch its scripts with the default token. Push history with `git push origin main` then `git push origin --tags`: when more than three tags are pushed at once GitHub starts no tag workflows, whereas pushing one to three old tags would start real release runs for them (which stop at the CI check, but are noise).
 - Create the organisation secret **`SITE_DISPATCH_TOKEN`**: a fine-grained token (or GitHub App) with *Contents: read and write* on `grand-stack.github.io` and `grandstack`, available to every repository that releases.
-- **Pages:** in `grand-stack.github.io` settings, set the source to *GitHub Actions* and the custom domain to `grandstack.ai` (the `CNAME` file is in the repository), and enforce HTTPS once DNS is ready.
-- **Workflow permissions:** allow Actions to create releases and push (read and write), and add a ruleset on the site's `main` that lets `github-actions[bot]` push. If `main` needs reviews for the bot, the refreshed docs copy is not committed (the site still deploys).
-- **Packages:** after the first publish, set each GHCR package to public and link it to its repository.
-- Enable Dependabot alerts and code scanning; protect `v*` tags from deletion; decide who may run the release button.
+- **Pages:** in `grand-stack.github.io` settings, set the source to *GitHub Actions* and the custom domain to `grandstack.ai` (with Actions-based Pages the domain is a setting; the `CNAME` file in the repository is kept for tools that read it), and enforce HTTPS once DNS is ready.
+- **Branch rules:** the release button pushes a commit and a tag directly, and the site job pushes the refreshed docs copy, both as `github-actions[bot]`. If a repository's `main` requires pull requests or status checks, add `github-actions[bot]` (or a GitHub App) as a bypass actor, or those steps fail.
+- **Packages:** after the first publish, set each GHCR package to public (images are linked to their repository automatically by a label).
+- Enable Dependabot alerts and the **dependency graph** (dependency review needs it). For code scanning use the workflows here: do **not** also switch on CodeQL's "default setup". Protect `v*` tags against deletion and rewriting, but do not block their creation, or the release button's tag push fails. Decide who may run the release button.
 
 ## First-run checklist
 
-1. In each repository run **ci** by opening a pull request, and fix anything that is red.
-2. Run **release** by hand with a tag and `dry-run` ticked: it validates and builds without publishing.
+1. After the first push, run **ci** in each repository (a pull request, or the push to `main`) and fix anything that is red.
+2. Run **release** by hand (Actions tab, *Run workflow*) with an existing tag and `dry-run` ticked: it validates and builds without publishing. Do not test it by pushing a tag: that is a real release.
 3. Run **release-cut** with `dry-run` on the smallest repository, then for real as a patch release. Check the GitHub Release, the images, and that the website rebuilt.
 4. Run **site** by hand once; run **integration** by hand once.
 
@@ -117,6 +119,7 @@ None of this can be done by the workflows themselves.
 | "package.json says version X, but the tag is Y" | Use the release button (it sets the versions), or run `npm version Y --no-git-tag-version` and commit before tagging |
 | A pushed tag did not start anything | Tags pushed with the default `GITHUB_TOKEN` do not start workflows; push it yourself, or use the release button, which chains the workflows |
 | "SITE_DISPATCH_TOKEN is not set" | The website was not told directly; it updates at its next hourly check. Create the secret to make it immediate |
+| The site workflow fails on a checkout or tag lookup (HTTP 404) | A repository is private or does not exist yet; the default token cannot read it. Make it public |
 | The site did not change after a release | Check the `site` run: the hourly check compares tags with `data/versions.json`; run it by hand. Pages must be set to *GitHub Actions* |
 | Copyright header check fails | Run `node ../.github/scripts/headers.mjs --root .` and commit |
 | Scheduled workflows stopped | GitHub disables schedules in repositories with no activity for 60 days; any commit or a manual run re-enables them |

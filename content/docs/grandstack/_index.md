@@ -111,7 +111,7 @@ Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (t
 
 The sample data has real titles, casts and relationships; ratings and runtimes are approximate.
 
-Last verified: grandstack v0.10.3 with grandstack-server v0.9.3, grandstack-web v0.5.4, grandstack-auth v0.1.4, grandstack-agents v0.1.5, grandstack-federation v0.1.4 and the website grand-stack.github.io v0.1.3, Neo4j 2026.10 community, under Podman 6 on macOS. All four compose setups were run end to end with `scripts/integration.sh`. The GitHub workflows have been linted but not run on GitHub.
+Last verified: grandstack v0.10.4 with grandstack-server v0.9.3, grandstack-web v0.5.4, grandstack-auth v0.1.4, grandstack-agents v0.1.5, grandstack-federation v0.1.4 and the website grand-stack.github.io v0.1.3, Neo4j 2026.10 community, under Podman 6 on macOS. All four compose setups were run end to end with `scripts/integration.sh`. The GitHub workflows have been linted but not run on GitHub.
 
 ## Licence
 

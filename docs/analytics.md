@@ -1,13 +1,13 @@
 # Analytics
 
-The site sends anonymous usage events to **Mixpanel** (EU region). Visitors are told in the footer of every page: "By continuing, you agree to our Privacy Policies", linking to Neo4j's privacy notice (https://neo4j.com/legal-terms/privacy-notice/); there is no banner and no Accept button. This page is the catalogue of what is sent, how to test it, and how to turn it off. Keep it in step with `assets/js/analytics.js`; the unit tests (`test/analytics-core.test.mjs`) and the browser test (`npm run test:browser`) cover the same behaviour.
+The site sends anonymous usage events to **Mixpanel** (US region). Visitors are told in the footer of every page: "By continuing, you agree to our Privacy Policies", linking to Neo4j's privacy notice (https://neo4j.com/legal-terms/privacy-notice/); there is no banner and no Accept button. This page is the catalogue of what is sent, how to test it, and how to turn it off. Keep it in step with `assets/js/analytics.js`; the unit tests (`test/analytics-core.test.mjs`) and the browser test (`npm run test:browser`) cover the same behaviour.
 
 ## How it works
 
 1. **The build decides whether analytics exists.** With a Mixpanel project token in the build environment (`HUGO_PARAMS_MIXPANELTOKEN`), the pages get a `<meta name="gs-analytics">` config tag, the footer notice and the analytics code. Without a token (local previews, pull requests, forks) none of that is in the output, and `npm run check` verifies it.
 2. **Tracking starts on page load**, on the production host only (the build's `baseURL`), or on any host with `?analytics=debug` in the URL (events then carry `env: "test"`). Continuing to use the site is the agreement, as the footer says.
 3. **The browser's privacy signals are still honoured.** If the browser sends **Global Privacy Control** or **Do Not Track**, nothing is loaded, stored or sent.
-4. Mixpanel's small loader (`mixpanel-jslib-snippet.min.js`) and library (`mixpanel.min.js`) are fetched **from this site** (`assets/js/vendor/`, version pinned in `package.json`), not from Mixpanel's CDN, and events go to `https://api-eu.mixpanel.com` (with IP geolocation). The anonymous id is kept in `localStorage`.
+4. Mixpanel's small loader (`mixpanel-jslib-snippet.min.js`) and library (`mixpanel.min.js`) are fetched **from this site** (`assets/js/vendor/`, version pinned in `package.json`), not from Mixpanel's CDN, and events go to `https://api.mixpanel.com` (with IP geolocation). The anonymous id is kept in `localStorage`.
 5. **Session replay and heatmaps** are sampled (see below). The recorder (`mixpanel-recorder.min.js`) is also served from this site and is only downloaded by visits that are sampled in.
 
 The Mixpanel token is public by design (it is visible in the page source of any site that uses Mixpanel). It is kept out of git as the repository **variable** `MIXPANEL_TOKEN` and passed to the build in `.github/workflows/site.yml`.
@@ -46,7 +46,7 @@ Half of the visits (`mixpanelRecordPercent = 50` in `hugo.toml`, or `HUGO_PARAMS
 
 ## Setting it up
 
-1. Create the repository variable (not a secret): **Settings, Secrets and variables, Actions, Variables, New repository variable** named `MIXPANEL_TOKEN` in `grand-stack/grand-stack.github.io` with the project token. The EU project is assumed: a token from another region needs `mixpanelHost` in `hugo.toml` changed too, or events are dropped.
+1. Create the repository variable (not a secret): **Settings, Secrets and variables, Actions, Variables, New repository variable** named `MIXPANEL_TOKEN` in `grand-stack/grand-stack.github.io` with the project token. The US project (the one the token belongs to; Neo Universal Prod) is assumed: a token from an EU or India project needs `https://api-eu.mixpanel.com` or `https://api-in.mixpanel.com` as `mixpanelHost` in `hugo.toml`, or events are dropped.
 2. Run the **site** workflow (or push). The next deploy has the notice.
 3. Open the live site and look in Mixpanel's *Live view* / *Events*.
 
@@ -60,7 +60,7 @@ npm run vendor -- --check   # the vendored Mixpanel files match the pinned packa
 HUGO_PARAMS_MIXPANELTOKEN=your-token hugo server   # then open http://localhost:1313/?analytics=debug
 ```
 
-The browser test proves: a normal visit sends a Page View with the project token and the first-touch source without any click; the footer notice and its link are on every page; each event above arrives with the expected properties; with Global Privacy Control or Do Not Track nothing is loaded or sent; with recording at 100 the vendored recorder is served by this site and replay data reaches `api-eu.mixpanel.com/record/` and no other host; at 0 the recorder is not downloaded and nothing is sent to `/record/`.
+The browser test proves: a normal visit sends a Page View with the project token and the first-touch source without any click; the footer notice and its link are on every page; each event above arrives with the expected properties; with Global Privacy Control or Do Not Track nothing is loaded or sent; with recording at 100 the vendored recorder is served by this site and replay data reaches `api.mixpanel.com/record/` and no other host; at 0 the recorder is not downloaded and nothing is sent to `/record/`.
 
 ## Adding or changing an event
 

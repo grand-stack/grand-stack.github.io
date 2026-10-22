@@ -60,7 +60,7 @@ async function visitor({ gpc = false, dnt = false, from = recorded } = {}) {
   await page.setRequestInterception(true);
   page.on("request", (req) => {
     const url = new URL(req.url());
-    if (url.hostname === "api-eu.mixpanel.com") {
+    if (url.hostname === "api.mixpanel.com") {
       // answer like Mixpanel does, including the CORS preflight the browser sends first (credentials are allowed for the page's origin)
       const cors = { "access-control-allow-origin": base, "access-control-allow-credentials": "true", "access-control-allow-headers": "content-type, authorization", "access-control-allow-methods": "GET, POST, OPTIONS" };
       if (req.method() === "OPTIONS") { req.respond({ status: 204, headers: cors }); return; }
@@ -107,7 +107,7 @@ try {
     await until(() => find(seen, "GS Page View").length > 0);
     const pv = find(seen, "GS Page View")[0];
     check("Mixpanel's loader, library and (sampled in) recorder are served by the site itself, once each", seen.scripts.length === 3, seen.scripts.join(", "));
-    check("a Page View is sent to the EU endpoint with the project token, without any click", !!pv && pv.properties.token === TOKEN);
+    check("a Page View is sent to Mixpanel's endpoint with the project token, without any click", !!pv && pv.properties.token === TOKEN);
     check("Page View carries section, UTM and viewport", !!pv && pv.properties.section === "home" && pv.properties.utm_source === "newsletter" && pv.properties.viewport === "desktop", JSON.stringify(pv?.properties));
     check("first-touch source is kept for later events", !!pv && pv.properties.initial_utm_source === "newsletter" && pv.properties.initial_path === "/");
     check("no request to any Mixpanel CDN or other host", seen.other.length === 0, seen.other.join(", "));
@@ -169,7 +169,7 @@ try {
     await page.mouse.move(200, 300); await page.evaluate(() => window.scrollTo(0, 600)); await page.mouse.click(400, 300);
     await until(() => seen.records.length > 0, 30000);
     check("sampled in: the vendored recorder is fetched from the site", seen.scripts.some((p) => /mixpanel-recorder/.test(p)), seen.scripts.join(", "));
-    check("sampled in: replay data is sent to the EU /record/ endpoint", seen.records.length > 0, seen.records.join(", "));
+    check("sampled in: replay data is sent to the /record/ endpoint", seen.records.length > 0, seen.records.join(", "));
     check("sampled in: events carry the replay id so they link to the recording", seen.events.some((e) => e.properties.$mp_replay_id), JSON.stringify(seen.events.map((e) => Object.keys(e.properties).filter((k) => k.startsWith("$mp_")))));
     check("sampled in: nothing is loaded from any other host", seen.other.length === 0, seen.other.join(", "));
     await context.close(); }

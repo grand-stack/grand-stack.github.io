@@ -51,7 +51,7 @@ node scripts/verify-examples.mjs --stack default --write      # also: agents, fe
 
 ## Analytics
 
-Anonymous usage analytics with Mixpanel (EU): page views, clicks to GitHub, copied commands and how visitors move through the docs, plus session replay and click/scroll heatmaps for half of the visits (images blocked, inputs masked). The footer tells visitors "By continuing, you agree to our Privacy Policies" (linking to Neo4j's privacy notice); there is no banner. Global Privacy Control and Do Not Track switch it off. Builds without the `MIXPANEL_TOKEN` repository variable have none of it. What is sent, how to test it and how to change it: [docs/analytics.md](docs/analytics.md).
+Anonymous usage analytics with Mixpanel (US region): page views, clicks to GitHub, copied commands and how visitors move through the docs, plus session replay and click/scroll heatmaps for half of the visits (images blocked, inputs masked). The footer tells visitors "By continuing, you agree to our Privacy Policies" (linking to Neo4j's privacy notice); there is no banner. Global Privacy Control and Do Not Track switch it off. Builds without the `MIXPANEL_TOKEN` repository variable have none of it. What is sent, how to test it and how to change it: [docs/analytics.md](docs/analytics.md).
 
 ## Deployment
 

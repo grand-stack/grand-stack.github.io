@@ -12,7 +12,7 @@ enableGitInfo = false
   githubOrg = "grand-stack"
   # Analytics (see docs/analytics.md). The Mixpanel project token comes from the build environment (HUGO_PARAMS_MIXPANELTOKEN);
   # without it the site has no analytics code, banner or settings link.
-  mixpanelHost = "https://api-eu.mixpanel.com"
+  mixpanelHost = "https://api.mixpanel.com"
   # Share of tracked visits recorded as session replays (0 to 100). HUGO_PARAMS_MIXPANELRECORDPERCENT overrides it (tests use 0 and 100).
   mixpanelRecordPercent = 50
   privacyUrl = "https://neo4j.com/legal-terms/privacy-notice/"

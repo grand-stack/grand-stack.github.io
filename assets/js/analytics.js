@@ -3,7 +3,7 @@
 //
 // Analytics (events, session replay and heatmaps). Does nothing at all unless the build contains a Mixpanel token (a <meta name="gs-analytics"> tag), the page is on the
 // production host (or has ?analytics=debug), and the browser has not asked not to be tracked (Global Privacy Control or Do Not Track).
-// Then the vendored Mixpanel library is loaded from this site and events are sent to Mixpanel's EU endpoint. The footer tells visitors
+// Then the vendored Mixpanel library is loaded from this site and events are sent to Mixpanel's endpoint. The footer tells visitors
 // that continuing means agreeing to the privacy policy.
 // Event names and properties are listed in docs/analytics.md: keep that file in step with this one.
 (function () {

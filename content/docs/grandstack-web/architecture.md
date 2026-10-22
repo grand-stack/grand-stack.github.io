@@ -71,7 +71,7 @@ Titles and names are the keys, so they appear URL-encoded in paths (`/people/Tim
 
 State lives in the **URL**, not in component state, for anything a user might want to share or reload:
 
-[![In grandstack-web the URL query string is parsed into a Filters object, turned into typed GraphQL variables, sent with urql, rendered, and any filter change is written back to the URL.](/diagrams/grandstack-web/url-state-data-flow.svg)](diagrams/url-state-data-flow.svg)
+[![In grandstack-web the URL query string is parsed into a Filters object, turned into typed GraphQL variables, sent with urql, rendered, and any filter change is written back to the URL.](/diagrams/grandstack-web/url-state-data-flow.svg)](/diagrams/grandstack-web/url-state-data-flow.svg)
 
 *Figure: one loop from the URL to the screen and back. Click the image for full size; the numbered notes below carry the same information as text.*
 

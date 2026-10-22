@@ -44,7 +44,7 @@ Applies to grandstack-server v0.7.1 (`@neo4j/graphql` 7.6.4, `graphql` 16.14, No
 
 ## What happens to a request
 
-[![grandstack-server start-up in eight steps: read config, connect, setup Cypher, seed, build the schema, create Yoga, listen, shut down; a failure at any step exits with the error.](/diagrams/grandstack-server/server-startup.svg)](diagrams/server-startup.svg)
+[![grandstack-server start-up in eight steps: read config, connect, setup Cypher, seed, build the schema, create Yoga, listen, shut down; a failure at any step exits with the error.](/diagrams/grandstack-server/server-startup.svg)](/diagrams/grandstack-server/server-startup.svg)
 
 *Figure: the eight start-up steps in order. Click the image for full size; the numbered notes below carry the same information as text.*
 
@@ -57,7 +57,7 @@ Applies to grandstack-server v0.7.1 (`@neo4j/graphql` 7.6.4, `graphql` 16.14, No
 7. **Listen.** On `PORT` (default 4000); GraphiQL is at `/graphql`.
 8. **Shut down.** On `SIGINT` or `SIGTERM` close the HTTP server and the driver.
 
-[![The path every request takes in grandstack-server: Yoga CORS check, per-request context, the counts plugin for mutations, the Neo4j GraphQL library translating to Cypher, the driver, and Neo4j.](/diagrams/grandstack-server/request-path.svg)](diagrams/request-path.svg)
+[![The path every request takes in grandstack-server: Yoga CORS check, per-request context, the counts plugin for mutations, the Neo4j GraphQL library translating to Cypher, the driver, and Neo4j.](/diagrams/grandstack-server/request-path.svg)](/diagrams/grandstack-server/request-path.svg)
 
 *Figure: the path every request takes. Click the image for full size; the numbered notes below carry the same information as text.*
 

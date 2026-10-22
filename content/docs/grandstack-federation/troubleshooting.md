@@ -1,6 +1,6 @@
 ---
 title: "Troubleshooting"
-description: ""
+description: "Troubleshooting"
 weight: 10
 repo: "grandstack-federation"
 section: "Help"

@@ -74,6 +74,8 @@ function rewrite(md, file, repo) {
   return parts.map((part, i) => {
     if (i % 2 === 1) return part;
     return part
+      // a clickable image: [![alt](image)](link)
+      .replace(/\[!\[([^\]]*)\]\(([^)\s]+)\)\]\(([^)\s]+)\)/g, (_, alt, src, href) => `[![${alt}](${fix(src, true)})](${fix(href, false)})`)
       .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_, alt, src) => `![${alt}](${fix(src, true)})`)
       .replace(/(^|[^!])\[([^\]]*(?:\[[^\]]*\][^\]]*)*)\]\(([^)\s]+)\)/g, (m, pre, text, href) => `${pre}[${text}](${fix(href, false)})`);
   }).join("");
@@ -88,7 +90,7 @@ for (const repo of manifest.repos) {
     if (!existsSync(abs)) { problems.push(`${repo.id}: manifest page ${page.file} does not exist`); return; }
     let md = readFileSync(abs, "utf8");
     const title = page.file === "AGENTS.md" ? "AGENTS.md: guide for coding agents" : page.slug === "index" ? `${repo.id}: overview` : titleOf(md, basename(page.file));
-    const description = descriptionOf(md);
+    const description = descriptionOf(md) || title;
     md = md.replace(/^#\s+.*\n+/m, "");
     md = rewrite(md, page.file, repo);
     const url = pageUrl(repo, page);

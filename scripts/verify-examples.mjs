@@ -28,6 +28,7 @@ for (const ex of examples) {
   ran++;
   let result = "";
   try { result = execSync(ex.command, { encoding: "utf8", shell: "/bin/sh", timeout: 60000 }); } catch (error) { result = String(error.stdout ?? "") + String(error.message); }
+  result = result.replace(/\}(\{")/g, "}\n$1"); // commands that print several JSON documents without newlines
   const ok = result.includes(ex.expect);
   console.log(`${ok ? "PASS" : "FAIL"}  ${ex.id}${ok ? "" : `: expected "${ex.expect}" in ${result.slice(0, 200)}`}`);
   if (!ok) failed++;

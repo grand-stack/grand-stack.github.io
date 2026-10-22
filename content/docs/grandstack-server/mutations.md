@@ -81,7 +81,7 @@ Deleting a node also deletes its relationships (it detaches), but the nodes at t
 
 `Person.actedCount` and `directedCount` are stored properties ([seeding](/docs/grandstack-server/seeding/#derived-counts)). `src/refreshCountsPlugin.ts` is a Yoga plugin that wraps execution: after any operation whose type is `mutation`, it runs the recalculation in `src/counts.ts` and only then returns the response. A client that refetches straight after a mutation therefore sees correct counts. Details:
 
-[![Editing a movie: the web app sends a relationship diff, the library applies it in one transaction, the counts plugin recalculates every person's counts, and only then the response is returned, so the refetch shows correct counts.](/diagrams/grandstack-server/edit-and-counts.svg)](diagrams/edit-and-counts.svg)
+[![Editing a movie: the web app sends a relationship diff, the library applies it in one transaction, the counts plugin recalculates every person's counts, and only then the response is returned, so the refetch shows correct counts.](/diagrams/grandstack-server/edit-and-counts.svg)](/diagrams/grandstack-server/edit-and-counts.svg)
 
 *Figure: an edit from the web app, step by step. Click the image for full size; the numbered notes below carry the same information as text.*
 

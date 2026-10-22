@@ -22,20 +22,20 @@ const fileFor = (urlPath) => {
   return existsSync(idx) ? idx : undefined;
 };
 const idsOf = (file) => {
-  if (!idsCache.has(file)) idsCache.set(file, new Set([...readFileSync(file, "utf8").matchAll(/\sid="([^"]+)"/g)].map((m) => m[1])));
+  if (!idsCache.has(file)) idsCache.set(file, new Set([...readFileSync(file, "utf8").matchAll(/\sid=(?:"([^"]+)"|'([^']+)'|([^\s">]+))/g)].map((m) => m[1] ?? m[2] ?? m[3])));
   return idsCache.get(file);
 };
 
 for (const file of html) {
   const rel = file.slice(pub.length);
   const text = readFileSync(file, "utf8");
-  for (const m of text.matchAll(/<img\b[^>]*>/g)) if (!/\balt="[^"]+"/.test(m[0])) problems.push(`${rel}: image without alt text ${m[0].slice(0, 80)}`);
+  for (const m of text.matchAll(/<img\b[^>]*>/g)) if (!/\balt=("[^"]+"|[^\s">][^\s>]*)/.test(m[0])) problems.push(`${rel}: image without alt text ${m[0].slice(0, 80)}`);
   for (const m of text.matchAll(/<script[^>]*\ssrc="(https?:)?\/\/[^"]+"/g)) problems.push(`${rel}: external script ${m[0]}`);
   for (const m of text.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="(https?:)?\/\/[^"]+"/g)) problems.push(`${rel}: external stylesheet ${m[0]}`);
   if (/fonts\.googleapis|fonts\.gstatic/.test(text)) problems.push(`${rel}: loads Google Fonts`);
   if (!/<title>[^<]+<\/title>/.test(text)) problems.push(`${rel}: no <title>`);
-  for (const m of text.matchAll(/<a\b[^>]*\shref="([^"]*)"/g)) {
-    const href = m[1].replace(/&amp;/g, "&");
+  for (const m of text.matchAll(/<a\b[^>]*?\shref=(?:"([^"]*)"|'([^']*)'|([^\s">]+))/g)) {
+    const href = (m[1] ?? m[2] ?? m[3]).replace(/&amp;/g, "&");
     if (/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(href)) continue; // external
     let [path, hash] = href.split("#");
     if (!path) path = rel.replace(/index\.html$/, "");

@@ -28,7 +28,8 @@
     <p class="sub">You need Docker or Podman with compose, and Node 22 or later for the examples. Everything runs on your machine.</p>
     <div class="grid two">
       <div class="card step"><span class="n">1</span><h3>Clone the repos side by side</h3><p>The umbrella repo holds the compose files; the others are built from its sibling folders.</p>
-<pre><code>git clone https://github.com/{{ $org }}/grandstack
+<pre><code>mkdir grand-stack &amp;&amp; cd grand-stack
+git clone https://github.com/{{ $org }}/grandstack
 git clone https://github.com/{{ $org }}/grandstack-server
 git clone https://github.com/{{ $org }}/grandstack-web</code></pre></div>
       <div class="card step"><span class="n">2</span><h3>Start the stack</h3><p>Neo4j, the GraphQL server (with 152 films and 464 people loaded) and the web app.</p>
@@ -39,7 +40,7 @@ docker compose up --build</code></pre></div>
       <div class="card step"><span class="n">4</span><h3>Query the API</h3><p>Any GraphQL client works; curl will do.</p>
 <pre><code>curl -s localhost:4000/graphql -H 'content-type: application/json' \
   -d '{"query":"{ moviesConnection { totalCount } }"}'</code></pre></div>
-      <div class="card step"><span class="n">5</span><h3>Let an agent use it</h3><p>Add the MCP server (read-only by default) and connect Claude Code.</p>
+      <div class="card step"><span class="n">5</span><h3>Let an agent use it</h3><p>Add the MCP server (read-only by default; needs the <code>grandstack-agents</code> repo beside the others) and connect Claude Code.</p>
 <pre><code>docker compose -f compose.yaml -f compose.agents.yaml up --build
 claude mcp add --transport http grandstack http://localhost:4100/mcp</code></pre></div>
       <div class="card"><h3>Then go further</h3><p>Add login, federate Wikipedia data into the graph, or build your own app on your own data.</p><a class="more" href="/docs/">Read the docs →</a></div>

@@ -16,7 +16,7 @@ This guide describes what is built today (the versions that were tested together
 
 ## Components
 
-[![System overview: the browser loads static files from the web container on port 3000, then sends GraphQL requests directly to the server on port 4000, which talks to Neo4j over Bolt.](/diagrams/grandstack/system-overview.svg)](diagrams/system-overview.svg)
+[![System overview: the browser loads static files from the web container on port 3000, then sends GraphQL requests directly to the server on port 4000, which talks to Neo4j over Bolt.](/diagrams/grandstack/system-overview.svg)](/diagrams/grandstack/system-overview.svg)
 
 *Figure: the default stack. The browser gets static files from one container and talks to the GraphQL server directly. Click the image for full size; the numbered notes below carry the same information as text.*
 
@@ -40,7 +40,7 @@ This guide describes what is built today (the versions that were tested together
 
 ## Data model (the sample)
 
-[![Data model: Person acted in and directed Movie, Movie is in Genre; Review and User come from the auth setup. Person counts are stored and derived, Movie.similar and Person.collaborators are computed.](/diagrams/grandstack/data-model.svg)](diagrams/data-model.svg)
+[![Data model: Person acted in and directed Movie, Movie is in Genre; Review and User come from the auth setup. Person counts are stored and derived, Movie.similar and Person.collaborators are computed.](/diagrams/grandstack/data-model.svg)](/diagrams/grandstack/data-model.svg)
 
 *Figure: the sample data model. Dashed boxes exist only in the auth setup. Click the image for full size; the numbered notes below carry the same information as text.*
 
@@ -73,7 +73,7 @@ Example: the user ticks the Drama genre on `/movies`.
 
 The default stack above is open. Adding `compose.auth.yaml` puts a gateway in front of the server and adds Keycloak and a demo client:
 
-[![Before and after: the default stack versus the stack with compose.auth.yaml, which adds a gateway in front, Keycloak, and removes the server's host port; grandstack-web is unchanged and becomes anonymous.](/diagrams/grandstack/open-vs-auth.svg)](diagrams/open-vs-auth.svg)
+[![Before and after: the default stack versus the stack with compose.auth.yaml, which adds a gateway in front, Keycloak, and removes the server's host port; grandstack-web is unchanged and becomes anonymous.](/diagrams/grandstack/open-vs-auth.svg)](/diagrams/grandstack/open-vs-auth.svg)
 
 *Figure: what `compose.auth.yaml` changes. New services are outlined in bold; the red dashed path is the one that disappears. Click the image for full size; the numbered notes below carry the same information as text.*
 
@@ -93,7 +93,7 @@ The default stack above is open. Adding `compose.auth.yaml` puts a gateway in fr
 
 `compose.agents.yaml` adds one service, `agents-mcp` on port 4100: an MCP server that accepts GraphQL statements and runs them against the server. An agent can also skip MCP and send GraphQL itself; both paths share one guarded executor.
 
-[![Two ways an agent can use the same GraphQL server: its own loop with a graphql tool, or any MCP client with the MCP server; both end in the same guarded executor and the open server.](/diagrams/grandstack/agents-direct-vs-mcp.svg)](diagrams/agents-direct-vs-mcp.svg)
+[![Two ways an agent can use the same GraphQL server: its own loop with a graphql tool, or any MCP client with the MCP server; both end in the same guarded executor and the open server.](/diagrams/grandstack/agents-direct-vs-mcp.svg)](/diagrams/grandstack/agents-direct-vs-mcp.svg)
 
 *Figure: the two agent paths. Click the image for full size; the numbered notes carry the same information as text.*
 
@@ -111,7 +111,7 @@ The default stack above is open. Adding `compose.auth.yaml` puts a gateway in fr
 
 `compose.federation.yaml` turns the server into a federation subgraph, adds a Wikipedia subgraph, and puts a gateway on port 4000 that serves one combined API. The Neo4j subgraph moves to port 4001.
 
-[![The federation setup: clients call a gateway on port 4000; it uses a composed supergraph and sends parts of each query to the Neo4j subgraph and to a Wikipedia subgraph, which calls the public Wikipedia API; a generated links file gives films and people their Wikipedia page.](/diagrams/grandstack/federation-overview.svg)](diagrams/federation-overview.svg)
+[![The federation setup: clients call a gateway on port 4000; it uses a composed supergraph and sends parts of each query to the Neo4j subgraph and to a Wikipedia subgraph, which calls the public Wikipedia API; a generated links file gives films and people their Wikipedia page.](/diagrams/grandstack/federation-overview.svg)](/diagrams/grandstack/federation-overview.svg)
 
 *Figure: the federation setup. Click the image for full size; the numbered notes carry the same information as text.*
 

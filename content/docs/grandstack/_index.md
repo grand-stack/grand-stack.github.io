@@ -93,6 +93,7 @@ Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (t
 | `grandstack-web` | React app with typed operations (open, no login) | its `README.md` and `docs/architecture.md` |
 | `grandstack-auth` | Gateway, Keycloak dev realm, auth schema rules, demo client, and the exercise for adding login to `grandstack-web` | its `README.md` and `docs/how-it-works.md` |
 | `grandstack-agents` | MCP server with generic GraphQL tools, a direct agent-loop example, and example code for using auth | its `README.md` and `docs/how-it-works.md` |
+| `grand-stack.github.io` | The website (https://grandstack.ai): Hugo, a generated copy of every repo's docs, examples, llms.txt | its `README.md` |
 | `grandstack-federation` | Wikipedia subgraph, gateway and supergraph, link builder; the server becomes a subgraph | its `README.md` and `docs/how-it-works.md` |
 
 ## Documentation
@@ -104,12 +105,12 @@ Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (t
 | [Agent guide](/docs/grandstack/agents/) | For coding agents: where to change what, checks, gotchas |
 | [Configuration](/docs/grandstack/configuration/) | Services, ports, settings (including the auth setup), Podman, resetting data |
 | [Versioning and releases](/docs/grandstack/versioning-and-releases/) | Tags, what is released, how to cut a release |
-| [Roadmap](/docs/grandstack/roadmap/) | Planned work (not built yet) |
+| [Roadmap](/docs/grandstack/roadmap/) | What is built and what is planned |
 | [llms.txt](https://github.com/grand-stack/grandstack/blob/main/llms.txt) | An index of all of this for agents (the public copy is https://grandstack.ai/llms.txt) |
 
 The sample data has real titles, casts and relationships; ratings and runtimes are approximate.
 
-Last verified: grandstack v0.9.1 with grandstack-server v0.9.0, grandstack-web v0.5.1, grandstack-auth v0.1.1, grandstack-agents v0.1.2 and grandstack-federation v0.1.1, Neo4j 2026.10 community, under Podman 6 on macOS.
+Last verified: grandstack v0.10.1 with grandstack-server v0.9.1, grandstack-web v0.5.2, grandstack-auth v0.1.2, grandstack-agents v0.1.3, grandstack-federation v0.1.2 and the website grand-stack.github.io v0.1.1, Neo4j 2026.10 community, under Podman 6 on macOS. The latest patch tags of the repositories only add LICENSE and NOTICE files and docs since each was last fully tested.
 
 ## Licence
 

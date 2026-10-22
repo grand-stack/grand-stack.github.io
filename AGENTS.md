@@ -7,7 +7,8 @@ The GRANDstack website: a Hugo site with its own theme. Most of `content/` is a 
 ```sh
 hugo server                         # preview
 npm run build && npm run check      # build, then check links, anchors, alt text, SVGs, llms.txt
-npm run sync                        # refresh the docs copy (repos must sit beside this one)
+npm run sync                        # refresh the docs copy (repos must sit beside this one); writes content/docs, content/roadmap.md, static/diagrams, data/docs.json, data/versions.json
+npm run sync:check                  # exit 1 if the copy is out of date
 node scripts/verify-examples.mjs --stack default --write   # run the examples (stack must be up)
 ```
 

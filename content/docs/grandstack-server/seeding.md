@@ -37,7 +37,7 @@ FOREACH (g IN f.genres | MERGE (ge:Genre {name: g}) MERGE (m)-[:IN_GENRE]->(ge))
 
 The decision is made by `decideSeed` in `src/seed.ts` using three facts: how many nodes with the **probe label** exist (`SEED_PROBE_LABEL`, default `Movie`), the version stored in a marker node `(:SeedMeta {name: 'movies'})`, and the `// seed-version: N` header in the file (1 if absent).
 
-[![Seed decision: with seeding on, the server checks for a SeedMeta marker and for nodes with the probe label, and loads into an empty database, reloads when the seed file is newer, skips when current, and leaves data it did not load alone.](/diagrams/grandstack-server/seed-decision.svg)](diagrams/seed-decision.svg)
+[![Seed decision: with seeding on, the server checks for a SeedMeta marker and for nodes with the probe label, and loads into an empty database, reloads when the seed file is newer, skips when current, and leaves data it did not load alone.](/diagrams/grandstack-server/seed-decision.svg)](/diagrams/grandstack-server/seed-decision.svg)
 
 *Figure: what the server does with the seed file on start. Click the image for full size; the numbered notes below carry the same information as text.*
 

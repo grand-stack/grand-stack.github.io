@@ -50,12 +50,12 @@
    "agents"
   ],
   "title": "Read the error, fix the statement",
-  "text": "GraphQL answers HTTP 200 with an errors array; the message says what to fix. This is the loop an agent follows.",
+  "text": "GraphQL answers HTTP 200 with an errors array; the message says what to fix, here with a suggestion. The second command is the corrected statement. This is the loop an agent follows.",
   "needs": "the default stack",
   "link": "/docs/grandstack-agents/direct-graphql/",
-  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ movies(where: { titel: \\\"x\\\" }) { title } }\"}'",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ movies(where: { titel: \\\"x\\\" }) { title } }\"}'\ncurl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ movies(where: { title: { eq: \\\"Heat\\\" } }) { title released } }\"}'",
   "expect": "Did you mean",
-  "output": "{\"errors\":[{\"message\":\"Field \\\"titel\\\" is not defined by type \\\"MovieWhere\\\". Did you mean \\\"title\\\"?\",\"locations\":[{\"line\":1,\"column\":19}],\"extensions\":{\"code\":\"GRAPHQL_VALIDATION_FAILED\"}}]}"
+  "output": "{\"errors\":[{\"message\":\"Field \\\"titel\\\" is not defined by type \\\"MovieWhere\\\". Did you mean \\\"title\\\"?\",\"locations\":[{\"line\":1,\"column\":19}],\"extensions\":{\"code\":\"GRAPHQL_VALIDATION_FAILED\"}}]}\n{\"data\":{\"movies\":[{\"title\":\"Heat\",\"released\":1995}]}}"
  },
  {
   "id": "mutate",
@@ -69,7 +69,7 @@
   "link": "/docs/grandstack-server/mutations/",
   "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"mutation { createMovies(input: [{ title: \\\"ZZ Example\\\", released: 2031 }]) { movies { title released } } }\"}'\ncurl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"mutation { deleteMovies(where: { title: { eq: \\\"ZZ Example\\\" } }) { nodesDeleted } }\"}'",
   "expect": "\"nodesDeleted\":1",
-  "output": "{\"data\":{\"createMovies\":{\"movies\":[{\"title\":\"ZZ Example\",\"released\":2031}]}}}{\"data\":{\"deleteMovies\":{\"nodesDeleted\":1}}}"
+  "output": "{\"data\":{\"createMovies\":{\"movies\":[{\"title\":\"ZZ Example\",\"released\":2031}]}}}\n{\"data\":{\"deleteMovies\":{\"nodesDeleted\":1}}}"
  },
  {
   "id": "mcp-tools",
@@ -112,7 +112,7 @@
    "mutation"
   ],
   "title": "Mutations are off by default",
-  "text": "The refusal comes back as text with isError, so the agent can read it. Set AGENTS_ALLOW_MUTATIONS=true to allow writes.",
+  "text": "The refusal comes back as text with isError, so the agent can read it. To allow writes, start compose with AGENTS_ALLOW_MUTATIONS=true (the server sees it as ALLOW_MUTATIONS=true).",
   "needs": "the agents setup",
   "link": "/docs/grandstack-agents/guardrails/",
   "command": "curl -s localhost:4100/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\\n  -d '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"run_mutation\",\"arguments\":{\"query\":\"mutation { deleteMovies { nodesDeleted } }\"}}}'",

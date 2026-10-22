@@ -18,7 +18,7 @@ Code: `src/pages/Results.tsx`, `src/search/FilterSidebar.tsx`, `src/lib/filters.
 
 - Filters: title text, genres (several), decades (several), minimum rating, maximum runtime, and a person (cast or director). Sort: rating, newest, oldest, title, shortest.
 
-[![One Results operation carries three where inputs: where for the movies and total, genreWhere (filters minus genres) for genre counts, and decadeWhere (filters minus decades) for decade counts.](/diagrams/grandstack-web/search-facets-sequence.svg)](diagrams/search-facets-sequence.svg)
+[![One Results operation carries three where inputs: where for the movies and total, genreWhere (filters minus genres) for genre counts, and decadeWhere (filters minus decades) for decade counts.](/diagrams/grandstack-web/search-facets-sequence.svg)](/diagrams/grandstack-web/search-facets-sequence.svg)
 
 *Figure: how one request returns the movies, the total and every filter option's count. Click the image for full size; the numbered notes below carry the same information as text.*
 

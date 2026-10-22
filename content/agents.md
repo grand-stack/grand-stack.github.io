@@ -29,7 +29,7 @@ claude mcp add --transport http grandstack http://localhost:4100/mcp
 
 ## Be careful with writes
 
-- **MCP is read-only by default.** `run_mutation` does nothing until the server starts with `ALLOW_MUTATIONS=true`. That flag guards the MCP path only; the server behind it is open. See [guardrails](/docs/grandstack-agents/guardrails/).
+- **MCP is read-only by default.** `run_mutation` does nothing until the server starts with `ALLOW_MUTATIONS=true` (in the compose setup, set `AGENTS_ALLOW_MUTATIONS=true`; compose passes it on under that name). That flag guards the MCP path only; the server behind it is open. See [guardrails](/docs/grandstack-agents/guardrails/).
 - **Real control is auth.** [Adding auth](/docs/grandstack-agents/adding-auth/) shows the same tools using a token against the `grandstack-auth` gateway, so an agent gets exactly the permissions of its role.
 
 ## Design the schema for the agent

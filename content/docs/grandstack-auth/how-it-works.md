@@ -16,7 +16,7 @@ Applies to grandstack-auth v0.1.1 with grandstack-server v0.7.1, Keycloak 26.8, 
 
 ## The pieces
 
-[![With auth on, the browser logs in at Keycloak, sends tokens to the gateway which validates them and checks permissions, the gateway forwards the header to the server which verifies again and applies row rules, and the server is reachable only through the gateway.](/diagrams/grandstack-auth/auth-architecture.svg)](diagrams/auth-architecture.svg)
+[![With auth on, the browser logs in at Keycloak, sends tokens to the gateway which validates them and checks permissions, the gateway forwards the header to the server which verifies again and applies row rules, and the server is reachable only through the gateway.](/diagrams/grandstack-auth/auth-architecture.svg)](/diagrams/grandstack-auth/auth-architecture.svg)
 
 *Figure: the auth setup. Every write passes two independent checks, and the server is only reachable through the gateway. Click the image for full size; the numbered notes below carry the same information as text.*
 
@@ -55,7 +55,7 @@ Reads are public. Writes need a token.
 
 ## A request, step by step
 
-[![A login with PKCE, then bob (editor) creates a movie and it succeeds, alice (user) makes the same call and the gateway answers 403 without calling the server, and alice editing a review she did not write returns an empty result because the row filter matches nothing.](/diagrams/grandstack-auth/login-and-protected-write.svg)](diagrams/login-and-protected-write.svg)
+[![A login with PKCE, then bob (editor) creates a movie and it succeeds, alice (user) makes the same call and the gateway answers 403 without calling the server, and alice editing a review she did not write returns an empty result because the row filter matches nothing.](/diagrams/grandstack-auth/login-and-protected-write.svg)](/diagrams/grandstack-auth/login-and-protected-write.svg)
 
 *Figure: login, an allowed write, a write refused at the gateway, and a write filtered out at the server. Click the image for full size; the numbered notes below carry the same information as text.*
 

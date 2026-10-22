@@ -1,6 +1,6 @@
 ---
 title: "Troubleshooting"
-description: ""
+description: "Troubleshooting"
 weight: 11
 repo: "grandstack-agents"
 section: "Help"

@@ -1,9 +1,10 @@
 // Copyright (c) "Neo4j"
 // Neo4j Sweden AB [http://neo4j.com]
 //
-// Opt-in analytics. Does nothing at all unless the build contains a Mixpanel token (a <meta name="gs-analytics"> tag), the page is on
-// the production host (or has ?analytics=debug), and the visitor has accepted. Only then is the vendored Mixpanel library
-// loaded from this site and events are sent to Mixpanel's EU endpoint. Declining, Do Not Track and Global Privacy Control send nothing.
+// Analytics. Does nothing at all unless the build contains a Mixpanel token (a <meta name="gs-analytics"> tag), the page is on the
+// production host (or has ?analytics=debug), and the browser has not asked not to be tracked (Global Privacy Control or Do Not Track).
+// Then the vendored Mixpanel library is loaded from this site and events are sent to Mixpanel's EU endpoint. The footer tells visitors
+// that continuing means agreeing to the privacy policy.
 // Event names and properties are listed in docs/analytics.md: keep that file in step with this one.
 (function () {
   var core = window.GSAnalyticsCore;
@@ -14,25 +15,16 @@
   var debug = /[?&]analytics=debug(&|$)/.test(location.search);
   if (location.hostname !== cfg.prodHost && !debug) return;
 
-  var KEY = "gs-consent";
-  var banner = document.getElementById("consent");
-  var settings = document.getElementById("privacy-settings");
+  if (!core.trackingAllowed(navigator.globalPrivacyControl === true, navigator.doNotTrack || window.doNotTrack || null)) return;
+
+  function read(k, area) { try { return (area || localStorage).getItem(k); } catch (e) { return null; } }
+  function write(k, v, area) { try { (area || localStorage).setItem(k, v); } catch (e) { /* storage blocked: nothing to remember */ } }
   var path = location.pathname;
   var section = core.sectionFor(path);
-  var mp = null;
   var started = false;
   var wired = false;
 
-  function read(k, area) { try { return (area || localStorage).getItem(k); } catch (e) { return null; } }
-  function write(k, v, area) { try { (area || localStorage).setItem(k, v); } catch (e) { /* storage blocked: the choice lasts for this page only */ } }
-  function state() {
-    return core.consentState(read(KEY), Date.now(), navigator.globalPrivacyControl === true, navigator.doNotTrack || window.doNotTrack || null);
-  }
-  function show() { if (banner) banner.hidden = false; } // a non-modal notice: it must not steal focus
-  function hide() { if (banner) banner.hidden = true; }
-
   function track(name, props, beacon) {
-    if (!mp) return;
     var all = props || {};
     all.page_path = all.page_path || path;
     // always go through window.mixpanel: it is the loader's queue until the library arrives, and the library itself after that
@@ -133,37 +125,12 @@
     s.onload = function () {
       if (!window.mixpanel || !window.mixpanel.init) return;
       window.mixpanel.init(cfg.token, { api_host: cfg.host, persistence: "localStorage", autocapture: false, record_sessions_percent: 0, track_pageview: false, ip: true, batch_flush_interval_ms: 1000, debug: debug });
-      mp = true; // calls made now are queued by the loader and replayed when the library arrives
-      pageView();
+      pageView(); // calls made now are queued by the loader and replayed when the library arrives
       wire();
-      if (settings) settings.hidden = false;
     };
     s.onerror = function () { started = false; };
     document.head.appendChild(s);
   }
 
-  function stop() {
-    if (mp) { try { window.mixpanel.opt_out_tracking(); window.mixpanel.reset(); } catch (e) { /* ignore */ } }
-    try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf("mp_") === 0 || k.indexOf("mixpanel") !== -1) localStorage.removeItem(k); }); } catch (e) { /* ignore */ }
-    mp = null;
-  }
-
-  function choose(choice) {
-    write(KEY, core.consentRecord(choice, Date.now()));
-    hide();
-    if (choice === "granted") start(); else if (started) { stop(); location.reload(); }
-  }
-
-  if (banner) banner.addEventListener("click", function (e) {
-    var b = e.target.closest ? e.target.closest("[data-consent]") : null;
-    if (b) choose(b.getAttribute("data-consent"));
-  });
-  if (settings) {
-    settings.addEventListener("click", function () { show(); });
-    settings.hidden = false; // the visitor can always reopen the choice once analytics is possible on this page
-  }
-
-  var current = state();
-  if (current === "granted") start();
-  else if (current === "ask") show();
+  start();
 })();

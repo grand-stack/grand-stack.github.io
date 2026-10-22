@@ -8,28 +8,18 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.GSAnalyticsCore = factory();
 })(this, function () {
-  var CONSENT_DAYS = 365;
   var SCROLL_STEPS = [25, 50, 75, 100];
 
-  /** Consent state from what is stored and the browser's privacy signals: "granted", "denied" or "ask". */
-  function consentState(stored, now, gpc, dnt) {
-    if (gpc === true || dnt === "1" || dnt === "yes") return "denied";
-    if (!stored) return "ask";
-    var parsed;
-    try { parsed = typeof stored === "string" ? JSON.parse(stored) : stored; } catch (e) { return "ask"; }
-    if (!parsed || (parsed.v !== "granted" && parsed.v !== "denied") || typeof parsed.t !== "number") return "ask";
-    if (now - parsed.t > CONSENT_DAYS * 86400000) return "ask";
-    return parsed.v;
+  /** False when the browser asks not to be tracked: Global Privacy Control, or Do Not Track set to "1" or "yes". */
+  function trackingAllowed(gpc, dnt) {
+    return !(gpc === true || dnt === "1" || dnt === "yes");
   }
-
-  /** The record to store for a choice. */
-  function consentRecord(choice, now) { return JSON.stringify({ v: choice, t: now }); }
 
   /** Which part of the site a path belongs to. */
   function sectionFor(path) {
     if (path === "/" || path === "") return "home";
     var first = path.split("/")[1];
-    return { quickstart: "quickstart", docs: "docs", examples: "examples", agents: "agents", privacy: "privacy" }[first] || "other";
+    return { quickstart: "quickstart", docs: "docs", examples: "examples", agents: "agents" }[first] || "other";
   }
 
   /** The repository a docs page belongs to (/docs/grandstack-server/mutations/ gives grandstack-server), or "". */
@@ -114,5 +104,5 @@
     return "";
   }
 
-  return { consentState: consentState, consentRecord: consentRecord, sectionFor: sectionFor, repoFor: repoFor, parseGithubUrl: parseGithubUrl, placementFrom: placementFrom, utmFrom: utmFrom, referrerDomain: referrerDomain, newScrollSteps: newScrollSteps, scrollPercent: scrollPercent, docsNavVia: docsNavVia, CONSENT_DAYS: CONSENT_DAYS };
+  return { trackingAllowed: trackingAllowed, sectionFor: sectionFor, repoFor: repoFor, parseGithubUrl: parseGithubUrl, placementFrom: placementFrom, utmFrom: utmFrom, referrerDomain: referrerDomain, newScrollSteps: newScrollSteps, scrollPercent: scrollPercent, docsNavVia: docsNavVia };
 });

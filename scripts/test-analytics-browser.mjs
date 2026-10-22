@@ -1,9 +1,9 @@
 // Copyright (c) "Neo4j"
 // Neo4j Sweden AB [http://neo4j.com]
 //
-// Browser test of the opt-in analytics. Builds the site with a dummy token for a local address, serves it, and drives headless Chrome with every
-// request to Mixpanel intercepted (nothing leaves the machine): nothing is sent or loaded before consent, Decline and Global Privacy Control send
-// nothing, and after Accept the expected events arrive with the expected properties.
+// Browser test of the analytics. Builds the site with a dummy token for a local address, serves it, and drives headless Chrome with every
+// request to Mixpanel intercepted (nothing leaves the machine): events arrive with the expected properties, the footer carries the privacy
+// notice, and Global Privacy Control and Do Not Track send nothing and load nothing.
 //   npm run test:browser          (CHROME_PATH if Chrome is not found; needs `npm ci` and Hugo)
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
@@ -40,7 +40,7 @@ async function until(fn, ms = 6000) { const end = Date.now() + ms; while (Date.n
 
 const browser = await puppeteer.launch({ executablePath: chrome, headless: true, args: ["--no-sandbox"] });
 // a fresh visitor: separate browsing context, with every request outside the local server captured
-async function visitor({ gpc = false, stored = null } = {}) {
+async function visitor({ gpc = false, dnt = false } = {}) {
   const context = await browser.createBrowserContext();
   const page = await context.newPage();
   await page.setViewport({ width: 1280, height: 800 });
@@ -69,10 +69,10 @@ async function visitor({ gpc = false, stored = null } = {}) {
       req.continue();
     } else { seen.other.push(req.url()); req.respond({ status: 204, body: "" }); }
   });
-  await page.evaluateOnNewDocument((gpcOn, storedValue) => {
+  await page.evaluateOnNewDocument((gpcOn, dntOn) => {
     if (gpcOn) Object.defineProperty(navigator, "globalPrivacyControl", { value: true });
-    if (storedValue && !sessionStorage.getItem("gs-test-seeded")) { localStorage.setItem("gs-consent", storedValue); sessionStorage.setItem("gs-test-seeded", "1"); }
-  }, gpc, stored);
+    if (dntOn) Object.defineProperty(navigator, "doNotTrack", { value: "1" });
+  }, gpc, dnt);
   return { context, page, seen };
 }
 const names = (seen) => seen.events.map((e) => e.event);
@@ -80,44 +80,24 @@ const find = (seen, name) => seen.events.filter((e) => e.event === name);
 const visible = (page, sel) => page.$eval(sel, (e) => !e.hidden && getComputedStyle(e).display !== "none").catch(() => false);
 
 try {
-  // 1. a fresh visitor: banner shown, nothing sent, nothing loaded
-  { const { context, page, seen } = await visitor();
-    await page.goto(base + "/", { waitUntil: "networkidle0" });
-    check("banner is shown to a fresh visitor", await visible(page, "#consent"));
-    await wait(800);
-    check("before consent: no request to Mixpanel", seen.mixpanel.length === 0, seen.mixpanel.join(", "));
-    check("before consent: the Mixpanel library is not downloaded", seen.scripts.length === 0, seen.scripts.join(", "));
-    check("before consent: no storage used for analytics", await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("mp_") || k.includes("mixpanel") || k === "gs-consent").length === 0));
-    check("the site loads nothing from other hosts", seen.other.length === 0, seen.other.join(", "));
-    // 2. decline
-    await page.click('[data-consent="denied"]');
-    await wait(300);
-    check("decline hides the banner", !(await visible(page, "#consent")));
-    await page.reload({ waitUntil: "networkidle0" });
-    await wait(500);
-    check("after decline and reload: banner stays away, still nothing sent", !(await visible(page, "#consent")) && seen.mixpanel.length === 0 && seen.scripts.length === 0);
-    await context.close(); }
-
-  // 3. Global Privacy Control: no banner, nothing sent, even with an earlier accept stored
-  { const { context, page, seen } = await visitor({ gpc: true, stored: JSON.stringify({ v: "granted", t: Date.now() }) });
-    await page.goto(base + "/", { waitUntil: "networkidle0" });
-    await wait(800);
-    check("Global Privacy Control: no banner and nothing sent", !(await visible(page, "#consent")) && seen.mixpanel.length === 0 && seen.scripts.length === 0);
-    await context.close(); }
-
-  // 4. accept: page view and everything else
+  // 1. a normal visitor: the footer notice, and tracking from the first page view, with no banner and no click needed
   { const { context, page, seen } = await visitor();
     await context.overridePermissions(base, ["clipboard-read", "clipboard-write"]);
     await page.goto(base + "/?utm_source=newsletter&utm_medium=email", { waitUntil: "networkidle0" });
-    await page.click('[data-consent="granted"]');
-    await page.waitForFunction(() => document.querySelector("#consent").hidden === true);
+    check("there is no consent banner", (await page.$("#consent")) === null && (await page.$("#privacy-settings")) === null);
+    const note = await page.$eval(".privacy-note", (e) => ({ text: e.textContent.trim(), href: e.querySelector("a").href })).catch(() => null);
+    check("the footer says: By continuing, you agree to our Privacy Policies", note?.text === "By continuing, you agree to our Privacy Policies.", JSON.stringify(note));
+    check("the Privacy Policies link goes to Neo4j's privacy notice", note?.href === "https://neo4j.com/legal-terms/privacy-notice/", note?.href);
     await until(() => find(seen, "Page View").length > 0);
     const pv = find(seen, "Page View")[0];
-    check("accept: Mixpanel's loader and library are served by the site itself, once each", seen.scripts.length === 2, seen.scripts.join(", "));
-    check("accept: a Page View is sent to the EU endpoint with the project token", !!pv && pv.properties.token === TOKEN);
+    check("Mixpanel's loader and library are served by the site itself, once each", seen.scripts.length === 2, seen.scripts.join(", "));
+    check("a Page View is sent to the EU endpoint with the project token, without any click", !!pv && pv.properties.token === TOKEN);
     check("Page View carries section, UTM and viewport", !!pv && pv.properties.section === "home" && pv.properties.utm_source === "newsletter" && pv.properties.viewport === "desktop", JSON.stringify(pv?.properties));
     check("first-touch source is kept for later events", !!pv && pv.properties.initial_utm_source === "newsletter" && pv.properties.initial_path === "/");
     check("no request to any Mixpanel CDN or other host", seen.other.length === 0, seen.other.join(", "));
+    const docNote = await (async () => { await page.goto(base + "/docs/grandstack-server/", { waitUntil: "networkidle0" }); return page.$eval(".privacy-note", (e) => e.textContent.trim()).catch(() => null); })();
+    check("the notice is in the footer of every page (checked on a docs page)", docNote === "By continuing, you agree to our Privacy Policies.");
+    await page.goto(base + "/?utm_source=newsletter&utm_medium=email", { waitUntil: "networkidle0" });
 
     await page.click(".cmd .copy"); await until(() => find(seen, "Copy Command").length > 0);
     check("Copy Command is sent with which command", find(seen, "Copy Command").some((e) => e.properties.command === "p-default" && /docker compose/.test(e.properties.text_start)));
@@ -158,22 +138,22 @@ try {
     await until(() => find(seen, "Time On Page").length > 0);
     check("Time On Page is sent when the page is left (5 s or more)", find(seen, "Time On Page").some((e) => e.properties.seconds >= 5));
 
-    // the choice is remembered
+    // moving to another page keeps tracking (a new page view, same visit)
     await page.goto(base + "/quickstart/", { waitUntil: "networkidle0" }); await until(() => find(seen, "Page View").some((e) => e.properties.section === "quickstart"));
-    check("a later page view after reload keeps tracking without asking again", !(await visible(page, "#consent")) && find(seen, "Page View").some((e) => e.properties.section === "quickstart"));
-    // change of mind
-    await page.click("#privacy-settings"); await wait(200);
-    check("Cookie settings reopens the banner", await visible(page, "#consent"));
-    await Promise.all([page.waitForNavigation().catch(() => {}), page.click('[data-consent="denied"]')]);
-    await wait(1500); // let anything already queued go out
-    const stored = await page.evaluate(() => ({ consent: JSON.parse(localStorage.getItem("gs-consent")).v, mp: Object.keys(localStorage).filter((k) => k.startsWith("mp_") || k.includes("mixpanel")).length }));
-    check("declining later clears the analytics identifier and stores the choice", stored.consent === "denied" && stored.mp === 0, JSON.stringify(stored));
-    const after = seen.mixpanel.length;
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    await page.click("a.brand").catch(() => {});
-    await wait(2500);
-    check("nothing more is sent after declining", seen.mixpanel.length === after, `${seen.mixpanel.length - after} request(s)`);
+    const second = find(seen, "Page View").find((e) => e.properties.section === "quickstart");
+    check("a later page is a new Page View in the same visit, with the first-touch source", !!second && second.properties.page_in_visit >= 2 && second.properties.initial_utm_source === "newsletter", JSON.stringify(second?.properties));
     await context.close(); }
+
+  // 2. Global Privacy Control and Do Not Track: nothing is loaded and nothing is sent
+  for (const [name, opts] of [["Global Privacy Control", { gpc: true }], ["Do Not Track", { dnt: true }]]) {
+    const { context, page, seen } = await visitor(opts);
+    await page.goto(base + "/", { waitUntil: "networkidle0" });
+    await page.click(".theme-toggle");
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await wait(2500);
+    check(`${name}: nothing is sent and the library is not downloaded`, seen.mixpanel.length === 0 && seen.scripts.length === 0, `${seen.mixpanel.length} requests, ${seen.scripts.length} scripts`);
+    await context.close();
+  }
 } finally {
   await browser.close();
   server.close();

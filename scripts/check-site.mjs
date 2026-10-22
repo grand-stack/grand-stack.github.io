@@ -54,9 +54,9 @@ for (const file of html) {
   for (const m of text.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=["']?(https?:)?\/\/[^"' >]*(mixpanel|mxpnl)[^"' >]*/gi)) problems.push(`${file.slice(pub.length)}: loads Mixpanel from another host: ${m[0].slice(0, 100)}`);
   if (withAnalytics.length) {
     if (!withAnalytics.includes(file)) problems.push(`${file.slice(pub.length)}: analytics is on for the site but this page has no gs-analytics config`);
-    if (!/id=["']?consent\b/.test(text)) problems.push(`${file.slice(pub.length)}: analytics is on but this page has no consent banner`);
-    if (!/href=["']?\/privacy\//.test(text)) problems.push(`${file.slice(pub.length)}: analytics is on but this page does not link to the privacy page`);
-  } else if (/id=["']?consent\b/.test(text) || /privacy-settings/.test(text)) problems.push(`${file.slice(pub.length)}: consent banner without analytics`);
+    if (!/By continuing, you agree to our <a href=["']?https:\/\/neo4j\.com\/legal-terms\/privacy-notice\/["']?>Privacy Policies<\/a>/.test(text)) problems.push(`${file.slice(pub.length)}: analytics is on but the footer has no "By continuing, you agree to our Privacy Policies" notice linking to Neo4j's privacy notice`);
+    if (/id=["']?consent\b/.test(text)) problems.push(`${file.slice(pub.length)}: a consent banner is no longer part of the site`);
+  } else if (/privacy-note/.test(text)) problems.push(`${file.slice(pub.length)}: privacy notice without analytics`);
 }
 if (withAnalytics.length) {
   const cfg = JSON.parse(readFileSync(withAnalytics[0], "utf8").match(/<meta name=["']?gs-analytics["']? content=(?:'([^']*)'|"([^"]*)")/).slice(1).find(Boolean).replace(/&#34;/g, '"'));
@@ -66,7 +66,6 @@ if (withAnalytics.length) {
   const leaked = files.filter((f) => /mixpanel/i.test(f) || (f.endsWith(".js") && /GSAnalyticsCore|api-eu\.mixpanel/.test(readFileSync(f, "utf8"))));
   for (const f of leaked) problems.push(`${f.slice(pub.length)}: analytics code in a build without a token`);
 }
-if (!existsSync(join(pub, "privacy", "index.html"))) problems.push("privacy page is missing");
 
 for (const svg of files.filter((f) => f.endsWith(".svg"))) {
   const t = readFileSync(svg, "utf8");

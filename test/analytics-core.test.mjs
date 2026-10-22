@@ -5,26 +5,15 @@ import { createRequire } from "node:module";
 import test from "node:test";
 
 const core = createRequire(import.meta.url)("../assets/js/analytics-core.js");
-const DAY = 86400000;
-const now = 1_800_000_000_000;
-
-test("consent: nothing stored means ask; a stored choice is honoured until it is a year old", () => {
-  assert.equal(core.consentState(null, now, false, null), "ask");
-  assert.equal(core.consentState(core.consentRecord("granted", now - 10 * DAY), now, false, null), "granted");
-  assert.equal(core.consentState(core.consentRecord("denied", now - 10 * DAY), now, false, null), "denied");
-  assert.equal(core.consentState(core.consentRecord("granted", now - 400 * DAY), now, false, null), "ask");
-});
-
-test("consent: Global Privacy Control and Do Not Track mean denied, even after an earlier accept", () => {
-  const granted = core.consentRecord("granted", now);
-  assert.equal(core.consentState(granted, now, true, null), "denied");
-  assert.equal(core.consentState(granted, now, false, "1"), "denied");
-  assert.equal(core.consentState(null, now, true, null), "denied");
-  assert.equal(core.consentState(granted, now, false, "0"), "granted");
-});
-
-test("consent: garbage in storage is treated as not chosen", () => {
-  for (const bad of ["{", "null", '{"v":"maybe","t":1}', '{"v":"granted"}', "[]", ""]) assert.equal(core.consentState(bad, now, false, null), "ask");
+test("tracking is allowed unless the browser asks not to be tracked", () => {
+  assert.equal(core.trackingAllowed(false, null), true);
+  assert.equal(core.trackingAllowed(false, "0"), true);
+  assert.equal(core.trackingAllowed(false, undefined), true);
+  assert.equal(core.trackingAllowed(true, null), false); // Global Privacy Control
+  assert.equal(core.trackingAllowed(false, "1"), false); // Do Not Track
+  assert.equal(core.trackingAllowed(false, "yes"), false);
+  assert.equal(core.trackingAllowed(true, "0"), false);
+  assert.equal(core.trackingAllowed("true", null), true); // only the boolean true counts as the signal
 });
 
 test("sections and repositories", () => {
@@ -33,7 +22,6 @@ test("sections and repositories", () => {
   assert.equal(core.sectionFor("/docs/grandstack-server/mutations/"), "docs");
   assert.equal(core.sectionFor("/examples/"), "examples");
   assert.equal(core.sectionFor("/agents/"), "agents");
-  assert.equal(core.sectionFor("/privacy/"), "privacy");
   assert.equal(core.sectionFor("/nope/"), "other");
   assert.equal(core.repoFor("/docs/grandstack-server/mutations/"), "grandstack-server");
   assert.equal(core.repoFor("/docs/"), "");

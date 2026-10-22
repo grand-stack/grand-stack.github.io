@@ -15,6 +15,12 @@
     "check": "node scripts/check-site.mjs",
     "verify-examples": "node scripts/verify-examples.mjs",
     "test": "node --test \"test/*.test.mjs\"",
-    "tags": "node scripts/latest-tags.mjs"
+    "tags": "node scripts/latest-tags.mjs",
+    "vendor": "node scripts/vendor-mixpanel.mjs",
+    "test:browser": "node scripts/test-analytics-browser.mjs"
+  },
+  "devDependencies": {
+    "mixpanel-browser": "2.84.0",
+    "puppeteer-core": "25.15.0"
   }
 }

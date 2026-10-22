@@ -1,0 +1,169 @@
+// Copyright (c) "Neo4j"
+// Neo4j Sweden AB [http://neo4j.com]
+//
+// Opt-in analytics. Does nothing at all unless the build contains a Mixpanel token (a <meta name="gs-analytics"> tag), the page is on
+// the production host (or has ?analytics=debug), and the visitor has accepted. Only then is the vendored Mixpanel library
+// loaded from this site and events are sent to Mixpanel's EU endpoint. Declining, Do Not Track and Global Privacy Control send nothing.
+// Event names and properties are listed in docs/analytics.md: keep that file in step with this one.
+(function () {
+  var core = window.GSAnalyticsCore;
+  var meta = document.querySelector('meta[name="gs-analytics"]');
+  if (!core || !meta) return;
+  var cfg;
+  try { cfg = JSON.parse(meta.getAttribute("content")); } catch (e) { return; }
+  var debug = /[?&]analytics=debug(&|$)/.test(location.search);
+  if (location.hostname !== cfg.prodHost && !debug) return;
+
+  var KEY = "gs-consent";
+  var banner = document.getElementById("consent");
+  var settings = document.getElementById("privacy-settings");
+  var path = location.pathname;
+  var section = core.sectionFor(path);
+  var mp = null;
+  var started = false;
+  var wired = false;
+
+  function read(k, area) { try { return (area || localStorage).getItem(k); } catch (e) { return null; } }
+  function write(k, v, area) { try { (area || localStorage).setItem(k, v); } catch (e) { /* storage blocked: the choice lasts for this page only */ } }
+  function state() {
+    return core.consentState(read(KEY), Date.now(), navigator.globalPrivacyControl === true, navigator.doNotTrack || window.doNotTrack || null);
+  }
+  function show() { if (banner) banner.hidden = false; } // a non-modal notice: it must not steal focus
+  function hide() { if (banner) banner.hidden = true; }
+
+  function track(name, props, beacon) {
+    if (!mp) return;
+    var all = props || {};
+    all.page_path = all.page_path || path;
+    // always go through window.mixpanel: it is the loader's queue until the library arrives, and the library itself after that
+    try { window.mixpanel.track(name, all, beacon ? { transport: "sendBeacon" } : undefined); } catch (e) { /* analytics must never break the page */ }
+  }
+
+  function markers(el) {
+    var out = [];
+    for (var n = el, i = 0; n && n.nodeType === 1 && i < 10; n = n.parentElement, i++) {
+      if (n.getAttribute("data-placement")) out.push("placement:" + n.getAttribute("data-placement"));
+      if (n.classList) for (var j = 0; j < n.classList.length; j++) out.push("class:" + n.classList[j]);
+    }
+    return out;
+  }
+  function viewport() { return window.matchMedia && window.matchMedia("(max-width: 52rem)").matches ? "mobile" : "desktop"; }
+  function theme() { return document.documentElement.getAttribute("data-theme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); }
+
+  function pageView() {
+    var visitPages = parseInt(read("gs-pages", sessionStorage) || "0", 10) + 1;
+    write("gs-pages", String(visitPages), sessionStorage);
+    var refDomain = core.referrerDomain(document.referrer, location.hostname);
+    var utm = core.utmFrom(location.search);
+    var first = {};
+    first.initial_path = path;
+    if (refDomain) first.initial_referrer_domain = refDomain;
+    Object.keys(utm).forEach(function (k) { first["initial_" + k] = utm[k]; });
+    window.mixpanel.register_once(first);
+    var props = { title: document.title, section: section, repo: core.repoFor(path), referrer_domain: refDomain, theme: theme(), viewport: viewport(), page_in_visit: visitPages, env: debug ? "test" : "production" };
+    Object.keys(utm).forEach(function (k) { props[k] = utm[k]; });
+    track("Page View", props);
+  }
+
+  function onClick(event) {
+    if (event.type === "click" && event.button !== 0) return;
+    if (event.type === "auxclick" && event.button !== 1) return;
+    var a = event.target && event.target.closest ? event.target.closest("a[href]") : null;
+    if (!a) return;
+    var gh = core.parseGithubUrl(a.href);
+    if (gh) {
+      track("GitHub Click", { destination_url: a.href.slice(0, 300), org_repo: gh.orgRepo, link_kind: gh.kind, link_text: (a.textContent || "").trim().slice(0, 80), placement: core.placementFrom(markers(a), section), env: debug ? "test" : "production" }, true);
+      return;
+    }
+    if (a.origin === location.origin) {
+      var via = core.docsNavVia(markers(a));
+      if (via) track("Docs Navigation", { via: via, from_path: path, to_path: a.pathname }, true);
+    }
+  }
+
+  var passed = [];
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      var pct = core.scrollPercent(window.pageYOffset || document.documentElement.scrollTop, window.innerHeight, document.documentElement.scrollHeight);
+      core.newScrollSteps(passed, pct).forEach(function (s) { passed.push(s); track("Scroll Depth", { percent: s }); });
+    });
+  }
+
+  var visibleSince = document.visibilityState === "visible" ? Date.now() : null;
+  var visibleMs = 0;
+  var timeSent = false;
+  function sendTime() {
+    if (timeSent) return;
+    if (visibleSince) { visibleMs += Date.now() - visibleSince; visibleSince = null; }
+    var seconds = Math.round(visibleMs / 1000);
+    if (seconds >= 5) { timeSent = true; track("Time On Page", { seconds: seconds }, true); }
+  }
+  function onVisibility() {
+    if (document.visibilityState === "hidden") sendTime();
+    else if (!visibleSince) { visibleSince = Date.now(); timeSent = false; }
+  }
+
+  function wire() {
+    if (wired) return;
+    wired = true;
+    document.addEventListener("click", onClick, true);
+    document.addEventListener("auxclick", onClick, true);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", sendTime);
+    document.addEventListener("gs:copy", function (e) { track("Copy Command", { command: e.detail.command, text_start: e.detail.text, placement: e.detail.placement }); });
+    document.addEventListener("gs:tab", function (e) { track("Setup Tab", { tab: e.detail.tab }); });
+    document.addEventListener("gs:filter", function (e) { track("Example Filter", { tag: e.detail.tag }); });
+    document.addEventListener("gs:theme", function (e) { track("Theme Toggle", { theme: e.detail.theme }); });
+    onScroll();
+  }
+
+  function start() {
+    if (started) return;
+    started = true;
+    // Mixpanel's small loader (vendored) creates a queue, then fetches the library from MIXPANEL_CUSTOM_LIB_URL: our own copy, not their CDN.
+    window.MIXPANEL_CUSTOM_LIB_URL = cfg.src;
+    var s = document.createElement("script");
+    s.src = cfg.snippet;
+    s.async = true;
+    s.onload = function () {
+      if (!window.mixpanel || !window.mixpanel.init) return;
+      window.mixpanel.init(cfg.token, { api_host: cfg.host, persistence: "localStorage", autocapture: false, record_sessions_percent: 0, track_pageview: false, ip: true, batch_flush_interval_ms: 1000, debug: debug });
+      mp = true; // calls made now are queued by the loader and replayed when the library arrives
+      pageView();
+      wire();
+      if (settings) settings.hidden = false;
+    };
+    s.onerror = function () { started = false; };
+    document.head.appendChild(s);
+  }
+
+  function stop() {
+    if (mp) { try { window.mixpanel.opt_out_tracking(); window.mixpanel.reset(); } catch (e) { /* ignore */ } }
+    try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf("mp_") === 0 || k.indexOf("mixpanel") !== -1) localStorage.removeItem(k); }); } catch (e) { /* ignore */ }
+    mp = null;
+  }
+
+  function choose(choice) {
+    write(KEY, core.consentRecord(choice, Date.now()));
+    hide();
+    if (choice === "granted") start(); else if (started) { stop(); location.reload(); }
+  }
+
+  if (banner) banner.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-consent]") : null;
+    if (b) choose(b.getAttribute("data-consent"));
+  });
+  if (settings) {
+    settings.addEventListener("click", function () { show(); });
+    settings.hidden = false; // the visitor can always reopen the choice once analytics is possible on this page
+  }
+
+  var current = state();
+  if (current === "granted") start();
+  else if (current === "ask") show();
+})();

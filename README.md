@@ -49,6 +49,10 @@ node scripts/verify-examples.mjs --stack default --write      # also: agents, fe
 | `scripts/` | `sync-docs.mjs`, `check-site.mjs`, `verify-examples.mjs` |
 | `static/` | Fonts, favicon, `CNAME` (www.grandstack.ai), generated diagrams |
 
+## Analytics
+
+Optional, opt-in analytics with Mixpanel (EU): a cookie-style notice, and only after Accept, anonymous events about page views, clicks to GitHub, copied commands and how visitors move through the docs. Builds without the `MIXPANEL_TOKEN` repository variable have none of it. What is sent, how to test it and how to change it: [docs/analytics.md](docs/analytics.md); what visitors are told: `content/privacy.md`.
+
 ## Deployment
 
 `.github/workflows/pages.yml` builds with Hugo 0.164 and deploys to GitHub Pages on every push to `main`. In the repository settings, set Pages to **GitHub Actions** and the custom domain to `www.grandstack.ai`; the `CNAME` file is in `static/`. The workflow has not been run from here.

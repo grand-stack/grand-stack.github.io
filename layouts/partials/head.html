@@ -17,5 +17,10 @@
 <meta property="og:url" content="{{ .Permalink }}">
 <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
 <script>(function(){var t=null;try{t=localStorage.getItem("theme")}catch(e){}if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";if(t)document.documentElement.setAttribute("data-theme",t)})()</script>
+{{- with site.Params.mixpaneltoken }}
+{{- $mp := resources.Get "js/vendor/mixpanel.min.js" | fingerprint }}
+{{- $snippet := resources.Get "js/vendor/mixpanel-jslib-snippet.min.js" | fingerprint }}
+<meta name="gs-analytics" content="{{ dict "token" . "host" site.Params.mixpanelhost "src" $mp.RelPermalink "snippet" $snippet.RelPermalink "prodHost" (urls.Parse site.BaseURL).Hostname | jsonify }}">
+{{- end }}
 {{- $css := resources.Get "css/main.css" | minify | fingerprint }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}">

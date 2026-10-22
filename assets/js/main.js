@@ -5,11 +5,15 @@
   var root = document.documentElement;
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
+  // Small page events that the optional analytics script (analytics.js) can listen for. Nothing happens if it is not there.
+  function announce(name, detail) { try { document.dispatchEvent(new CustomEvent(name, { detail: detail })); } catch (e) { /* ignore */ } }
+
   var toggle = document.querySelector(".theme-toggle");
   if (toggle) toggle.addEventListener("click", function () {
     var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
     root.setAttribute("data-theme", next);
     store("theme", next);
+    announce("gs:theme", { theme: next });
   });
 
   function copyText(text, button) {
@@ -20,11 +24,20 @@
     if (pre.closest(".cmd") || pre.querySelector(".copy")) return;
     var b = document.createElement("button");
     b.className = "copy"; b.type = "button"; b.textContent = "copy"; b.setAttribute("aria-label", "Copy code");
-    b.addEventListener("click", function () { copyText(pre.innerText.replace(/\ncopy$/, "").replace(/copy$/, ""), b); });
+    b.addEventListener("click", function () {
+      var text = pre.innerText.replace(/\ncopy$/, "").replace(/copy$/, "");
+      copyText(text, b);
+      announce("gs:copy", { command: "code-block", text: text.trim().slice(0, 60), placement: "code-block" });
+    });
     pre.appendChild(b);
   });
   document.querySelectorAll(".cmd .copy").forEach(function (b) {
-    b.addEventListener("click", function () { copyText(b.closest(".cmd").querySelector("pre").innerText.trim(), b); });
+    b.addEventListener("click", function () {
+      var text = b.closest(".cmd").querySelector("pre").innerText.trim();
+      var panel = b.closest(".tab-panel");
+      copyText(text, b);
+      announce("gs:copy", { command: panel ? panel.id : "cmd", text: text.slice(0, 60), placement: "home-hero" });
+    });
   });
 
   document.querySelectorAll("[data-tabs]").forEach(function (group) {
@@ -34,7 +47,7 @@
       tabs.forEach(function (t) { t.setAttribute("aria-selected", t === tab ? "true" : "false"); });
       scope.querySelectorAll(".tab-panel").forEach(function (p) { p.hidden = p.id !== tab.getAttribute("aria-controls"); });
     }
-    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t); }); });
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t); announce("gs:tab", { tab: t.id }); }); });
   });
 
   var chips = document.querySelectorAll(".chip");
@@ -44,6 +57,7 @@
       chip.addEventListener("click", function () {
         var tag = chip.getAttribute("data-tag");
         chips.forEach(function (c) { c.setAttribute("aria-pressed", c === chip ? "true" : "false"); });
+        announce("gs:filter", { tag: tag });
         cards.forEach(function (card) {
           var tags = (card.getAttribute("data-tags") || "").split(" ");
           card.hidden = tag !== "all" && tags.indexOf(tag) === -1;

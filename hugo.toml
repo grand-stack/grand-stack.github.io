@@ -10,6 +10,9 @@ enableGitInfo = false
 [params]
   description = "GraphQL and Neo4j, for developers and agents."
   githubOrg = "grand-stack"
+  # Analytics (opt-in, see docs/analytics.md). The Mixpanel project token comes from the build environment (HUGO_PARAMS_MIXPANELTOKEN);
+  # without it the site has no analytics code, banner or settings link.
+  mixpanelHost = "https://api-eu.mixpanel.com"
 
 [markup]
   [markup.goldmark]

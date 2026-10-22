@@ -47,6 +47,27 @@ for (const file of html) {
     if (hash && target.endsWith(".html") && !idsOf(target).has(decodeURIComponent(hash))) problems.push(`${rel}: missing anchor ${href}`);
   }
 }
+// analytics: never a third-party script; and either fully present (token built in) or fully absent
+const withAnalytics = html.filter((f) => /<meta name=["']?gs-analytics/.test(readFileSync(f, "utf8")));
+for (const file of html) {
+  const text = readFileSync(file, "utf8");
+  for (const m of text.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=["']?(https?:)?\/\/[^"' >]*(mixpanel|mxpnl)[^"' >]*/gi)) problems.push(`${file.slice(pub.length)}: loads Mixpanel from another host: ${m[0].slice(0, 100)}`);
+  if (withAnalytics.length) {
+    if (!withAnalytics.includes(file)) problems.push(`${file.slice(pub.length)}: analytics is on for the site but this page has no gs-analytics config`);
+    if (!/id=["']?consent\b/.test(text)) problems.push(`${file.slice(pub.length)}: analytics is on but this page has no consent banner`);
+    if (!/href=["']?\/privacy\//.test(text)) problems.push(`${file.slice(pub.length)}: analytics is on but this page does not link to the privacy page`);
+  } else if (/id=["']?consent\b/.test(text) || /privacy-settings/.test(text)) problems.push(`${file.slice(pub.length)}: consent banner without analytics`);
+}
+if (withAnalytics.length) {
+  const cfg = JSON.parse(readFileSync(withAnalytics[0], "utf8").match(/<meta name=["']?gs-analytics["']? content=(?:'([^']*)'|"([^"]*)")/).slice(1).find(Boolean).replace(/&#34;/g, '"'));
+  for (const key of ["src", "snippet"]) if (!existsSync(join(pub, cfg[key]))) problems.push(`analytics ${key} file ${cfg[key]} is not in the build`);
+  if (!/^https:\/\/api-eu\.mixpanel\.com\/?$/.test(cfg.host)) problems.push(`analytics host is ${cfg.host}, expected the EU endpoint`);
+} else {
+  const leaked = files.filter((f) => /mixpanel/i.test(f) || (f.endsWith(".js") && /GSAnalyticsCore|api-eu\.mixpanel/.test(readFileSync(f, "utf8"))));
+  for (const f of leaked) problems.push(`${f.slice(pub.length)}: analytics code in a build without a token`);
+}
+if (!existsSync(join(pub, "privacy", "index.html"))) problems.push("privacy page is missing");
+
 for (const svg of files.filter((f) => f.endsWith(".svg"))) {
   const t = readFileSync(svg, "utf8");
   if (/<script|<foreignObject|\son[a-z]+=|javascript:/i.test(t)) problems.push(`${svg.slice(pub.length)}: unsafe SVG content`);

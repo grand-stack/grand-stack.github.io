@@ -72,6 +72,9 @@ jobs:
       - name: Refresh the docs copy, build, check
         if: ${{ steps.tags.outputs.run == 'true' }}
         working-directory: work/grand-stack.github.io
+        env:
+          # the Mixpanel project token (a public value): without it the site is built with no analytics
+          HUGO_PARAMS_MIXPANELTOKEN: ${{ vars.MIXPANEL_TOKEN }}
         run: |
           npm run sync
           hugo --gc --minify

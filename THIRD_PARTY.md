@@ -11,6 +11,14 @@ The site's code (layouts, CSS, JavaScript, scripts) is Apache-2.0 (see LICENSE).
 
 The font files come unchanged from the `@fontsource/public-sans` and `@fontsource/fira-code` packages (5.3.0), Latin subset. The OFL permits bundling and redistribution with software under another licence; the fonts themselves stay under the OFL and may not be sold on their own.
 
+## Analytics library (bundled in `assets/js/vendor/`)
+
+| Library | Files | Licence |
+| --- | --- | --- |
+| mixpanel-browser 2.84.0 | `mixpanel.min.js`, `mixpanel-jslib-snippet.min.js` | Apache License 2.0 |
+
+Copied unchanged from the npm package by `npm run vendor`. It is served from this site and only loaded after a visitor accepts analytics (see `docs/analytics.md`).
+
 ## Design
 
 The look follows https://neo4j.sh (palette, type and layout ideas). No files, images or logos are copied from that site, and the site does not use the Neo4j logo.

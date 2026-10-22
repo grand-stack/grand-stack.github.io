@@ -184,3 +184,18 @@ a.card { color: inherit; } a.card:hover { text-decoration: none; border-color: v
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 @media print { .site-header, .sidebar, .site-footer, .pager, .copy { display: none; } .docs { display: block; } }
+
+/* cookie-style consent notice (shown only when analytics is built in) */
+.consent { position: fixed; z-index: 50; left: 1rem; bottom: 1rem; max-width: 26rem; background: var(--bg); color: var(--fg); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-overlay); padding: 1.1rem 1.2rem; }
+.consent[hidden] { display: none; }
+.consent-title { margin: 0 0 .3rem; font-weight: 700; }
+.consent p { margin: 0 0 .6rem; font-size: .9rem; color: var(--fg-muted); line-height: 1.5; }
+.consent-title { color: var(--fg); }
+.consent-actions { display: flex; gap: .6rem; }
+.consent-btn { flex: 1; font: 600 .9rem var(--font-sans); padding: .6rem 1rem; border-radius: 8px; border: 1px solid var(--fg); background: var(--fg); color: var(--bg); cursor: pointer; }
+.consent-btn.consent-accept { background: var(--accent); border-color: var(--accent); color: #fff; }
+.consent-btn:hover { opacity: .9; }
+.linklike { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
+.linklike:hover { color: var(--accent-hover); text-decoration: underline; }
+@media (max-width: 52rem) { .consent { left: 0; right: 0; bottom: 0; max-width: none; border-radius: var(--radius) var(--radius) 0 0; border-width: 1px 0 0; } }
+@media print { .consent { display: none; } }

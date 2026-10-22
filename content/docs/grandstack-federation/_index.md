@@ -74,4 +74,4 @@ Last verified: grandstack-federation v0.1.1 with grandstack-server v0.9.0, grand
 
 ## Licence
 
-Apache License 2.0. See [LICENSE](https://github.com/grand-stack/grandstack-federation/blob/main/LICENSE) and [NOTICE](https://github.com/grand-stack/grandstack-federation/blob/main/NOTICE). The same licence applies to every GRANDstack repository and to [grandstack.ai](https://grandstack.ai).
+Apache License 2.0. See [LICENSE](https://github.com/grand-stack/grandstack-federation/blob/main/LICENSE) and [NOTICE](https://github.com/grand-stack/grandstack-federation/blob/main/NOTICE). The same licence applies to every GRANDstack repository and to [grandstack.ai](https://www.grandstack.ai).

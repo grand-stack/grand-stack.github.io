@@ -38,6 +38,11 @@
           "url": "/docs/grandstack/versioning-and-releases/",
           "title": "Versioning and releases",
           "section": "Project"
+        },
+        {
+          "url": "/docs/grandstack/releasing/",
+          "title": "Releasing, CI and the website",
+          "section": "Project"
         }
       ]
     },

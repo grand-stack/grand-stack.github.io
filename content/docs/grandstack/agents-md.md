@@ -23,3 +23,4 @@ Compose stack plus the overview docs for GRANDstack (GraphQL on Neo4j: `grandsta
 - Diagrams: `docs/diagrams/*.svg` are hand-written SVG with numbered callouts, each embedded with a numbered text legend. When you change the behaviour a diagram shows, edit the SVG and its legend in the same change; `node scripts/check-links.mjs` fails if an image has no alt text, an SVG contains script or style, or the legend numbers differ from the callouts drawn.
 
 - New code files need the copyright header (two lines: `Copyright (c) "Neo4j"` and `Neo4j Sweden AB [http://neo4j.com]`, in the file's comment syntax). Run `node ../grandstack/scripts/add-headers.mjs` to add it everywhere; `--check` lists what is missing. Generated files are exempt.
+- Releases use the **release-cut** workflow (Actions tab), which sets the version in every `package.json`, tags and publishes. Do not bump versions or push tags by hand; see `grandstack/docs/releasing.md`.

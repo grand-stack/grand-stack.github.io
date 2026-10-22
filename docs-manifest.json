@@ -35,6 +35,10 @@
         {
           "file": "docs/versioning-and-releases.md",
           "section": "Project"
+        },
+        {
+          "file": "docs/releasing.md",
+          "section": "Project"
         }
       ]
     },

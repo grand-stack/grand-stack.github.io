@@ -1,0 +1,102 @@
+# Copyright (c) "Neo4j"
+# Neo4j Sweden AB [http://neo4j.com]
+#
+# Rebuilds and deploys grandstack.ai. It runs when a repository publishes a release (that repository's release workflow sends
+# repo-released), every hour as a fallback (it rebuilds only if a repository has a newer release than the site shows), when someone
+# pushes to main, and by hand. It checks out every documented repository at its latest release tag beside this one, refreshes the
+# docs copy, builds and checks the site, commits the refreshed copy to main, and deploys to GitHub Pages.
+name: site
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [repo-released]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+concurrency:
+  group: site
+  cancel-in-progress: false
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+env:
+  HUGO_VERSION: "0.164.0"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.tags.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: work/grand-stack.github.io }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - name: Latest release of every repository
+        id: tags
+        working-directory: work/grand-stack.github.io
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/latest-tags.mjs
+      - name: Nothing new
+        if: ${{ steps.tags.outputs.run != 'true' }}
+        run: echo "No repository has a newer release than the site shows; nothing to do."
+      # The documented repositories, each at its latest release tag (or the default branch if it has none yet), beside the site
+      - uses: actions/checkout@v4
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { repository: "${{ github.repository_owner }}/grandstack", ref: "${{ fromJSON(steps.tags.outputs.tags)['grandstack'] || '' }}", path: work/grandstack, fetch-depth: 0 }
+      - uses: actions/checkout@v4
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { repository: "${{ github.repository_owner }}/grandstack-server", ref: "${{ fromJSON(steps.tags.outputs.tags)['grandstack-server'] || '' }}", path: work/grandstack-server, fetch-depth: 0 }
+      - uses: actions/checkout@v4
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { repository: "${{ github.repository_owner }}/grandstack-web", ref: "${{ fromJSON(steps.tags.outputs.tags)['grandstack-web'] || '' }}", path: work/grandstack-web, fetch-depth: 0 }
+      - uses: actions/checkout@v4
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { repository: "${{ github.repository_owner }}/grandstack-auth", ref: "${{ fromJSON(steps.tags.outputs.tags)['grandstack-auth'] || '' }}", path: work/grandstack-auth, fetch-depth: 0 }
+      - uses: actions/checkout@v4
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { repository: "${{ github.repository_owner }}/grandstack-agents", ref: "${{ fromJSON(steps.tags.outputs.tags)['grandstack-agents'] || '' }}", path: work/grandstack-agents, fetch-depth: 0 }
+      - uses: actions/checkout@v4
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { repository: "${{ github.repository_owner }}/grandstack-federation", ref: "${{ fromJSON(steps.tags.outputs.tags)['grandstack-federation'] || '' }}", path: work/grandstack-federation, fetch-depth: 0 }
+      - name: Install Hugo
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        run: |
+          curl -sSL -o hugo.tar.gz "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
+          tar -xzf hugo.tar.gz hugo && sudo mv hugo /usr/local/bin/
+          hugo version
+      - name: Refresh the docs copy, build, check
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        working-directory: work/grand-stack.github.io
+        run: |
+          npm run sync
+          hugo --gc --minify
+          npm run check
+      - name: Commit the refreshed copy to main
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        working-directory: work/grand-stack.github.io
+        env:
+          SUMMARY: ${{ steps.tags.outputs.summary }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content data static
+          if git diff --cached --quiet; then echo "The docs copy is already up to date."; exit 0; fi
+          git commit -m "docs: sync from releases${SUMMARY:+ ($SUMMARY)}"
+          # best effort: if main is protected against the bot, say so and still deploy what was built
+          git push origin HEAD:main || echo "::warning::Could not push the refreshed docs copy to main (branch protection?). The site was still built and deployed from it."
+      - uses: actions/upload-pages-artifact@v3
+        if: ${{ steps.tags.outputs.run == 'true' }}
+        with: { path: work/grand-stack.github.io/public }
+  deploy:
+    needs: build
+    if: ${{ needs.build.outputs.run == 'true' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,18 +1,37 @@
 # Copyright (c) "Neo4j"
 # Neo4j Sweden AB [http://neo4j.com]
+#
+# Pull requests and pushes: unit tests, copyright headers, and a build and check of the committed docs copy.
 name: ci
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+env:
+  HUGO_VERSION: "0.164.0"
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Hugo
-        run: |
-          curl -sSL -o hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.164.0/hugo_extended_0.164.0_linux-amd64.tar.gz
-          tar -xzf hugo.tar.gz hugo && sudo mv hugo /usr/local/bin/
-          hugo version
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/.github
+          ref: v1
+          path: .shared-ci
       - uses: actions/setup-node@v4
         with: { node-version: 24 }
+      - name: Install Hugo
+        run: |
+          curl -sSL -o hugo.tar.gz "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
+          tar -xzf hugo.tar.gz hugo && sudo mv hugo /usr/local/bin/
+      - run: npm test
+      - name: Copyright headers
+        run: node .shared-ci/scripts/headers.mjs --root . --check
       - run: hugo --gc --minify
-      - run: node scripts/check-site.mjs
+      - run: npm run check

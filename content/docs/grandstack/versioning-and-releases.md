@@ -18,32 +18,34 @@ Every repository uses **semantic versions as git tags** (`v0.6.0`). A change tha
 
 | Repository | Latest tag | Notes |
 | --- | --- | --- |
-| `grandstack-server` | `v0.9.2` | v0.9.2: copyright headers on code files. v0.9.1: LICENSE and NOTICE. v0.9.0: `FEDERATION` setting (federation subgraph), `@apollo/subgraph` pinned to 2.14.4. v0.7.1: annotated diagrams (docs only). v0.7.0 added the generic auth settings (`AUTH_*`, `SCHEMA_EXTRA_PATHS`, `SETUP_CYPHER_PATHS`); earlier: `SEED_PROBE_LABEL`, `REFRESH_COUNTS`, schema reference generator, docs |
-| `grandstack-web` | `v0.5.3` | v0.5.3: copyright headers on code files. v0.5.2: LICENSE and NOTICE. v0.5.1: annotated diagrams (docs only). v0.5.0: Docs, shared `hash` and `initials` helpers, browser end-to-end script |
-| `grandstack-auth` | `v0.1.3` | v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1: annotated diagrams (docs only). v0.1.0: gateway, Keycloak dev realm, auth schema rules, demo client, smoke and browser tests, the exercise and its reference patch (made against `grandstack-web` v0.5.0) |
-| `grand-stack.github.io` | `v0.1.2` | v0.1.2: title "GraphQL and Neo4j", roadmap page removed from the site, copyright headers. v0.1.1: fixes after cold reads (diagram links, checker, quickstart, README). v0.1.0: | The website (https://grandstack.ai): hand-written Hugo theme, a generated copy of every repo's docs, examples verified against real stacks, llms.txt and llms-full.txt, Apache-2.0 |
-| `grandstack-federation` | `v0.1.3` | v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1 and earlier: | v0.1.1: docs fixes after cold reads. v0.1.0: Wikipedia subgraph, gateway config and supergraph, link builder and committed links, smoke script, docs and diagrams |
-| `grandstack-agents` | `v0.1.4` | v0.1.4: copyright headers on code files. v0.1.3: LICENSE and NOTICE. v0.1.2 and earlier: | v0.1.2: `@cypher` in the schema design docs. v0.1.1: docs on schema design for agents. v0.1.0: MCP server (stdio and streamable HTTP) with generic GraphQL tools, read-only by default; direct agent-loop example; auth example code; docs and diagrams; Dockerfile |
-| `grandstack` | `v0.10.2` | v0.10.2: copyright headers on code files (`scripts/add-headers.mjs`), NOTICE copyright is Neo4j. v0.10.1: docs refresh (README versions, roadmap row). v0.10.0: LICENSE (Apache-2.0) and NOTICE in every repo, roadmap (phase 7 done), pointers to the website. v0.9.1: versions table. v0.9.0: `compose.federation.yaml`, roadmap (phase 6 done, site is phase 7), docs. v0.8.2: table update. v0.8.1: docs pointers to schema design for agents. v0.8.0: `compose.agents.yaml` (opt-in agents MCP server), roadmap re-cut, docs. v0.7.1: annotated diagrams. v0.7.0: `compose.auth.yaml` (opt-in auth), docs |
+| `grandstack-server` | `v0.9.3` | v0.9.3: setup Cypher runs after the seed (fixes first-start links on a fresh database), workflows. v0.9.2: copyright headers on code files. v0.9.1: LICENSE and NOTICE. v0.9.0: `FEDERATION` setting (federation subgraph), `@apollo/subgraph` pinned to 2.14.4. v0.7.1: annotated diagrams (docs only). v0.7.0 added the generic auth settings (`AUTH_*`, `SCHEMA_EXTRA_PATHS`, `SETUP_CYPHER_PATHS`); earlier: `SEED_PROBE_LABEL`, `REFRESH_COUNTS`, schema reference generator, docs |
+| `grandstack-web` | `v0.5.4` | v0.5.4: workflows. v0.5.3: copyright headers on code files. v0.5.2: LICENSE and NOTICE. v0.5.1: annotated diagrams (docs only). v0.5.0: Docs, shared `hash` and `initials` helpers, browser end-to-end script |
+| `grandstack-auth` | `v0.1.4` | v0.1.4: workflows. v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1: annotated diagrams (docs only). v0.1.0: gateway, Keycloak dev realm, auth schema rules, demo client, smoke and browser tests, the exercise and its reference patch (made against `grandstack-web` v0.5.0) |
+| `grand-stack.github.io` | `v0.1.3` | v0.1.3: `site.yml` (rebuild on every release), tag resolver, CI. v0.1.2: title "GraphQL and Neo4j", roadmap page removed from the site, copyright headers. v0.1.1: fixes after cold reads (diagram links, checker, quickstart, README). v0.1.0: | The website (https://grandstack.ai): hand-written Hugo theme, a generated copy of every repo's docs, examples verified against real stacks, llms.txt and llms-full.txt, Apache-2.0 |
+| `grandstack-federation` | `v0.1.4` | v0.1.4: docs note on setup order, workflows. v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1 and earlier: | v0.1.1: docs fixes after cold reads. v0.1.0: Wikipedia subgraph, gateway config and supergraph, link builder and committed links, smoke script, docs and diagrams |
+| `grandstack-agents` | `v0.1.5` | v0.1.5: workflows. v0.1.4: copyright headers on code files. v0.1.3: LICENSE and NOTICE. v0.1.2 and earlier: | v0.1.2: `@cypher` in the schema design docs. v0.1.1: docs on schema design for agents. v0.1.0: MCP server (stdio and streamable HTTP) with generic GraphQL tools, read-only by default; direct agent-loop example; auth example code; docs and diagrams; Dockerfile |
+| `.github` | `v1.1.0` (`v1`) | Shared reusable workflows (CI, release, release button, CodeQL, dependency review), scripts, org profile and community files |
+| `grandstack` | `v0.10.3` | v0.10.3: GitHub workflows (CI, release, nightly integration), `scripts/integration.sh`, releasing guide. v0.10.2: copyright headers on code files (`scripts/add-headers.mjs`), NOTICE copyright is Neo4j. v0.10.1: docs refresh (README versions, roadmap row). v0.10.0: LICENSE (Apache-2.0) and NOTICE in every repo, roadmap (phase 7 done), pointers to the website. v0.9.1: versions table. v0.9.0: `compose.federation.yaml`, roadmap (phase 6 done, site is phase 7), docs. v0.8.2: table update. v0.8.1: docs pointers to schema design for agents. v0.8.0: `compose.agents.yaml` (opt-in agents MCP server), roadmap re-cut, docs. v0.7.1: annotated diagrams. v0.7.0: `compose.auth.yaml` (opt-in auth), docs |
 
-The versions that were tested together are the ones in this table. All tags are **local so far**: nothing is pushed or published, and no images are in a registry.
+The versions that were tested together are the ones in this table. All tags are **local so far**: nothing is pushed or published, and no images are in a registry. The release workflows that will publish them are described in [releasing](/docs/grandstack/releasing/).
 
 ## How the umbrella pins versions (today and planned)
 
 - **Today**, `compose.yaml` builds the server and web images from the sibling checkouts (`build: ../grandstack-server`). To get a known-good combination, check out the tags in the table in each repo.
 - **Planned:** once images are published, `compose.yaml` will reference image tags (for example `grandstack-server:0.6.0`), and the umbrella's own tag will name the set. That change is on the [roadmap](https://github.com/grand-stack/grandstack/blob/main/docs/roadmap.md).
 
-## Cutting a release (per repo)
+## Cutting a release
 
-1. Make sure the working tree is clean and the checks pass:
-   - server: `npm run lint && npm test && npm run schema:check && npm run docs:check`
-   - web: `npm run typecheck && npm test && npm run docs:check`, and with a freshly seeded stack `npm run e2e`
-   - auth: unit tests in `gateway/` and `client/`, `npm run docs:check`, `npm run verify-exercise`, and with the auth stack running `npm run smoke` and `npm run e2e`
-2. If the server schema changed, run `npm run docs:schema` and commit the updated reference.
-3. Update the version references in the READMEs and in this file.
-4. Commit, then tag: `git tag v0.X.Y`.
-5. Server: build the image with the same tag (`docker build -t grandstack-server:0.X.Y .`).
-6. Update the umbrella's table and tag the umbrella last.
+Use the **release-cut** workflow in the repository's Actions tab (patch, minor or major). It checks that CI is green on `main`, sets the version in every `package.json`, tags `vX.Y.Z`, publishes the GitHub Release and the container images, and tells the website to rebuild. The whole process, with a diagram, the one-time setup and a first-run checklist, is in [releasing, CI and the website](/docs/grandstack/releasing/). The tag must equal the `package.json` version; a mismatch fails the release.
+
+Before releasing, the checks that CI runs can be run locally:
+
+- server: `npm run lint && npm test && npm run schema:check && npm run docs:check`
+- web: `npm run typecheck && npm test && npm run docs:check`, and with a freshly seeded stack `npm run e2e`
+- auth: unit tests in `gateway/` and `client/`, `npm run docs:check`, `npm run verify-exercise`, and with the auth stack running `npm run smoke` and `npm run e2e`
+- all four compose setups: `scripts/integration.sh default|agents|auth|federation` (in this repository)
+
+If the server schema changed, run `npm run docs:schema` and commit the updated reference. Update the table above when a release changes what was tested together.
 
 ## Breaking changes
 

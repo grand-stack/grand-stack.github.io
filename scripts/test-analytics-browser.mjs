@@ -75,6 +75,9 @@ async function visitor({ gpc = false, dnt = false } = {}) {
   }, gpc, dnt);
   return { context, page, seen };
 }
+// Keep the page alive when a GitHub link is clicked: our handler is registered after the analytics one (same phase, later), so the event is
+// recorded first and then the navigation is cancelled. Whether a beacon survives a page unload under request interception varies by machine.
+const holdGithubLinks = (page) => page.evaluate(() => document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest('a[href^="https://github.com"]'); if (a) e.preventDefault(); }, true));
 const names = (seen) => seen.events.map((e) => e.event);
 const find = (seen, name) => seen.events.filter((e) => e.event === name);
 const visible = (page, sel) => page.$eval(sel, (e) => !e.hidden && getComputedStyle(e).display !== "none").catch(() => false);
@@ -109,9 +112,10 @@ try {
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await until(() => find(seen, "GS Scroll Depth").some((e) => e.properties.percent === 100));
     check("Scroll Depth reaches 100 and each step is sent once", [25, 50, 75, 100].every((p) => find(seen, "GS Scroll Depth").filter((e) => e.properties.percent === p).length === 1), find(seen, "GS Scroll Depth").map((e) => e.properties.percent).join(","));
 
-    // GitHub click from the header (navigates away: the beacon must still arrive)
+    // GitHub click from the header
     await page.evaluate(() => window.scrollTo(0, 0));
-    await Promise.all([page.waitForNavigation().catch(() => {}), page.click('.site-header a[href^="https://github.com"]')]);
+    await holdGithubLinks(page);
+    await page.click('.site-header a[href^="https://github.com"]');
     await until(() => find(seen, "GS GitHub Click").length > 0);
     const gh = find(seen, "GS GitHub Click")[0];
     check("GitHub Click from the header: org, kind and placement", !!gh && gh.properties.org_repo === "grand-stack" && gh.properties.link_kind === "org" && gh.properties.placement === "header", JSON.stringify(gh?.properties));
@@ -124,7 +128,8 @@ try {
     await until(() => find(seen, "GS Docs Navigation").length > 0);
     check("Docs Navigation via the sidebar", find(seen, "GS Docs Navigation").some((e) => e.properties.via === "sidebar" && e.properties.to_path === "/docs/grandstack-server/mutations/"));
     await page.goto(base + "/docs/grandstack-server/mutations/", { waitUntil: "networkidle0" });
-    await Promise.all([page.waitForNavigation().catch(() => {}), page.evaluate(() => document.querySelector(".source a").click())]);
+    await holdGithubLinks(page);
+    await page.evaluate(() => document.querySelector(".source a").click());
     await until(() => find(seen, "GS GitHub Click").some((e) => e.properties.placement === "docs-source"));
     const src = find(seen, "GS GitHub Click").find((e) => e.properties.placement === "docs-source");
     check("GitHub Click from a docs 'source' link: repo, file kind, placement", !!src && src.properties.org_repo === "grand-stack/grandstack-server" && src.properties.link_kind === "file", JSON.stringify(src?.properties));

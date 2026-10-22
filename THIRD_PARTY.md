@@ -15,9 +15,9 @@ The font files come unchanged from the `@fontsource/public-sans` and `@fontsourc
 
 | Library | Files | Licence |
 | --- | --- | --- |
-| mixpanel-browser 2.84.0 | `mixpanel.min.js`, `mixpanel-jslib-snippet.min.js` | Apache License 2.0 |
+| mixpanel-browser 2.84.0 | `mixpanel.min.js`, `mixpanel-jslib-snippet.min.js`, `mixpanel-recorder.min.js` | Apache License 2.0 |
 
-Copied unchanged from the npm package by `npm run vendor`. It is served from this site and only loaded after a visitor accepts analytics (see `docs/analytics.md`).
+Copied unchanged from the npm package by `npm run vendor`. They are served from this site, not from Mixpanel's CDN, and only loaded when analytics is built in and the visitor's browser sends no Global Privacy Control or Do Not Track signal (see `docs/analytics.md`). The session recorder bundles the open-source rrweb recorder (rrweb, rrdom, rrweb-snapshot, rrweb-types, rrweb-utils, rrweb-plugin-console-record 2.0.0-alpha.18), mitt, nanoid, base64-arraybuffer, fsm, json-logic-js and css-font-loading-module (MIT), picocolors (ISC), postcss (MIT) and source-map-js (BSD-3-Clause), as listed in the package's `mixpanel-browser.cdx.json`.
 
 ## Design
 

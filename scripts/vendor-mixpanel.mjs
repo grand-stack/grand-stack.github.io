@@ -2,8 +2,8 @@
 // Neo4j Sweden AB [http://neo4j.com]
 //
 // Copies the pinned mixpanel-browser build into the site (assets/js/vendor/), so it is served from our own address and only loaded
-// after a visitor accepts analytics: mixpanel.min.js (the library) and mixpanel-jslib-snippet.min.js (Mixpanel's small loader, pointed at our copy
-// of the library). The copies are committed (like the fonts); this script refreshes them, or checks them.
+// after a visitor accepts analytics: mixpanel.min.js (the library), mixpanel-jslib-snippet.min.js (Mixpanel's small loader, pointed at our copy
+// of the library) and mixpanel-recorder.min.js (session replay, loaded only for visits that are sampled in). The copies are committed (like the fonts); this script refreshes them, or checks them.
 //   npm run vendor            copy both files from node_modules/mixpanel-browser/dist/
 //   npm run vendor -- --check exit 1 if a committed copy differs from the installed package (run in CI)
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "node_modules/mixpanel-browser/dist");
-const files = ["mixpanel.min.js", "mixpanel-jslib-snippet.min.js"];
+const files = ["mixpanel.min.js", "mixpanel-jslib-snippet.min.js", "mixpanel-recorder.min.js"];
 const source = join(dist, files[0]);
 if (!existsSync(source)) { console.error("mixpanel-browser is not installed: run `npm ci` first."); process.exit(2); }
 const version = JSON.parse(readFileSync(join(root, "node_modules/mixpanel-browser/package.json"), "utf8")).version;

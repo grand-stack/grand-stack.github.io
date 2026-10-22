@@ -15,22 +15,30 @@ import puppeteer from "puppeteer-core";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const TOKEN = "test-token-not-real";
-const dest = mkdtempSync(join(tmpdir(), "gs-analytics-"));
 const chrome = process.env.CHROME_PATH ?? ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"].find(existsSync);
 if (!chrome) { console.error("Chrome not found: set CHROME_PATH"); process.exit(2); }
 
 const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".txt": "text/plain", ".woff2": "font/woff2", ".xml": "application/xml" };
-const server = createServer((req, res) => {
-  const path = decodeURIComponent(req.url.split("?")[0]);
-  let file = join(dest, path);
-  if (existsSync(file) && !extname(file)) file = join(file, "index.html");
-  else if (!extname(file)) file = join(file, "index.html");
-  if (!existsSync(file)) { res.writeHead(404).end("not found"); return; }
-  res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" }).end(readFileSync(file));
-});
-await new Promise((r) => server.listen(0, "127.0.0.1", r));
-const base = `http://127.0.0.1:${server.address().port}`;
-execFileSync("hugo", ["--gc", "--minify", "--destination", dest, "--baseURL", base + "/"], { cwd: root, env: { ...process.env, HUGO_PARAMS_MIXPANELTOKEN: TOKEN }, stdio: "pipe" });
+// Build the site for a local address with a dummy token, and serve it. `percent` is the share of visits that are recorded as replays.
+const servers = [];
+async function site(percent) {
+  const dest = mkdtempSync(join(tmpdir(), "gs-analytics-"));
+  const server = createServer((req, res) => {
+    const path = decodeURIComponent(req.url.split("?")[0]);
+    let file = join(dest, path);
+    if (!extname(file)) file = join(file, "index.html");
+    if (!existsSync(file)) { res.writeHead(404).end("not found"); return; }
+    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" }).end(readFileSync(file));
+  });
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  servers.push(server);
+  const base = `http://127.0.0.1:${server.address().port}`;
+  execFileSync("hugo", ["--gc", "--minify", "--destination", dest, "--baseURL", base + "/"], { cwd: root, env: { ...process.env, HUGO_PARAMS_MIXPANELTOKEN: TOKEN, HUGO_PARAMS_MIXPANELRECORDPERCENT: String(percent) }, stdio: "pipe" });
+  return { dest, base };
+}
+const recorded = await site(100); // every visit is sampled in
+const notRecorded = await site(0); // no visit is
+let base = recorded.base;
 
 let failed = 0;
 const check = (name, ok, detail = "") => { console.log(`${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `: ${detail}`}`); if (!ok) failed++; };
@@ -38,21 +46,26 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // the library sends events in batches about a second apart: poll for an event instead of waiting a fixed time
 async function until(fn, ms = 6000) { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return true; await wait(150); } return false; }
 
-const browser = await puppeteer.launch({ executablePath: chrome, headless: true, args: ["--no-sandbox"] });
+// one browser per visitor: a long-lived headless Chrome can quit on its own part way through (its updater), which would end the run
+const launch = () => puppeteer.launch({ executablePath: chrome, headless: true, args: ["--no-sandbox"] });
 // a fresh visitor: separate browsing context, with every request outside the local server captured
-async function visitor({ gpc = false, dnt = false } = {}) {
+async function visitor({ gpc = false, dnt = false, from = recorded } = {}) {
+  const base = from.base;
+  const browser = await launch();
   const context = await browser.createBrowserContext();
   const page = await context.newPage();
   await page.setViewport({ width: 1280, height: 800 });
-  const seen = { mixpanel: [], scripts: [], other: [], events: [] };
+  if (process.env.DEBUG_PAGE) { page.on("console", (m) => console.log("CONSOLE", m.text())); page.on("pageerror", (e) => console.log("PAGEERROR", e.message)); }
+  const seen = { mixpanel: [], records: [], scripts: [], other: [], events: [] };
   await page.setRequestInterception(true);
   page.on("request", (req) => {
     const url = new URL(req.url());
     if (url.hostname === "api-eu.mixpanel.com") {
       // answer like Mixpanel does, including the CORS preflight the browser sends first (credentials are allowed for the page's origin)
-      const cors = { "access-control-allow-origin": base, "access-control-allow-credentials": "true", "access-control-allow-headers": "content-type", "access-control-allow-methods": "GET, POST, OPTIONS" };
+      const cors = { "access-control-allow-origin": base, "access-control-allow-credentials": "true", "access-control-allow-headers": "content-type, authorization", "access-control-allow-methods": "GET, POST, OPTIONS" };
       if (req.method() === "OPTIONS") { req.respond({ status: 204, headers: cors }); return; }
       seen.mixpanel.push(req.url());
+      if (url.pathname.startsWith("/record")) seen.records.push(req.url());
       const body = req.postData() ?? "";
       const data = new URLSearchParams(body).get("data") ?? url.searchParams.get("data");
       if (data) {
@@ -73,11 +86,11 @@ async function visitor({ gpc = false, dnt = false } = {}) {
     if (gpcOn) Object.defineProperty(navigator, "globalPrivacyControl", { value: true });
     if (dntOn) Object.defineProperty(navigator, "doNotTrack", { value: "1" });
   }, gpc, dnt);
-  return { context, page, seen };
+  return { context: { overridePermissions: (...a) => context.overridePermissions(...a), close: () => browser.close() }, page, seen };
 }
 // Keep the page alive when a GitHub link is clicked: our handler is registered after the analytics one (same phase, later), so the event is
 // recorded first and then the navigation is cancelled. Whether a beacon survives a page unload under request interception varies by machine.
-const holdGithubLinks = (page) => page.evaluate(() => document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest('a[href^="https://github.com"]'); if (a) e.preventDefault(); }, true));
+const holdGithubLinks = (page, sel = 'a[href^="https://github.com"]') => page.evaluate((sel) => document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest(sel); if (a) e.preventDefault(); }, true), sel);
 const names = (seen) => seen.events.map((e) => e.event);
 const find = (seen, name) => seen.events.filter((e) => e.event === name);
 const visible = (page, sel) => page.$eval(sel, (e) => !e.hidden && getComputedStyle(e).display !== "none").catch(() => false);
@@ -93,7 +106,7 @@ try {
     check("the Privacy Policies link goes to Neo4j's privacy notice", note?.href === "https://neo4j.com/legal-terms/privacy-notice/", note?.href);
     await until(() => find(seen, "GS Page View").length > 0);
     const pv = find(seen, "GS Page View")[0];
-    check("Mixpanel's loader and library are served by the site itself, once each", seen.scripts.length === 2, seen.scripts.join(", "));
+    check("Mixpanel's loader, library and (sampled in) recorder are served by the site itself, once each", seen.scripts.length === 3, seen.scripts.join(", "));
     check("a Page View is sent to the EU endpoint with the project token, without any click", !!pv && pv.properties.token === TOKEN);
     check("Page View carries section, UTM and viewport", !!pv && pv.properties.section === "home" && pv.properties.utm_source === "newsletter" && pv.properties.viewport === "desktop", JSON.stringify(pv?.properties));
     check("first-touch source is kept for later events", !!pv && pv.properties.initial_utm_source === "newsletter" && pv.properties.initial_path === "/");
@@ -124,6 +137,7 @@ try {
     // docs page: sidebar navigation, source link
     await page.goto(base + "/docs/grandstack-server/", { waitUntil: "networkidle0" });
     await wait(400);
+    await holdGithubLinks(page, ".sidebar a");
     await page.evaluate(() => document.querySelector('.sidebar a[href="/docs/grandstack-server/mutations/"]').click());
     await until(() => find(seen, "GS Docs Navigation").length > 0);
     check("Docs Navigation via the sidebar", find(seen, "GS Docs Navigation").some((e) => e.properties.via === "sidebar" && e.properties.to_path === "/docs/grandstack-server/mutations/"));
@@ -149,7 +163,25 @@ try {
     check("a later page is a new Page View in the same visit, with the first-touch source", !!second && second.properties.page_in_visit >= 2 && second.properties.initial_utm_source === "newsletter", JSON.stringify(second?.properties));
     await context.close(); }
 
-  // 2. Global Privacy Control and Do Not Track: nothing is loaded and nothing is sent
+  // 2. session replay and heatmaps: sampled in at 100, never at 0
+  { const { context, page, seen } = await visitor();
+    await page.goto(base + "/", { waitUntil: "networkidle0" });
+    await page.mouse.move(200, 300); await page.evaluate(() => window.scrollTo(0, 600)); await page.mouse.click(400, 300);
+    await until(() => seen.records.length > 0, 30000);
+    check("sampled in: the vendored recorder is fetched from the site", seen.scripts.some((p) => /mixpanel-recorder/.test(p)), seen.scripts.join(", "));
+    check("sampled in: replay data is sent to the EU /record/ endpoint", seen.records.length > 0, seen.records.join(", "));
+    check("sampled in: events carry the replay id so they link to the recording", seen.events.some((e) => e.properties.$mp_replay_id), JSON.stringify(seen.events.map((e) => Object.keys(e.properties).filter((k) => k.startsWith("$mp_")))));
+    check("sampled in: nothing is loaded from any other host", seen.other.length === 0, seen.other.join(", "));
+    await context.close(); }
+  { const { context, page, seen } = await visitor({ from: notRecorded });
+    await page.goto(notRecorded.base + "/", { waitUntil: "networkidle0" });
+    await page.mouse.move(200, 300); await page.evaluate(() => window.scrollTo(0, 600));
+    await until(() => find(seen, "GS Page View").length > 0);
+    await wait(2500);
+    check("sampled out: events still flow, but the recorder is not downloaded and nothing is sent to /record/", find(seen, "GS Page View").length > 0 && !seen.scripts.some((p) => /mixpanel-recorder/.test(p)) && seen.records.length === 0, `${seen.scripts.join(", ")} | ${seen.records.length} record requests`);
+    await context.close(); }
+
+  // 3. Global Privacy Control and Do Not Track: nothing is loaded and nothing is sent
   for (const [name, opts] of [["Global Privacy Control", { gpc: true }], ["Do Not Track", { dnt: true }]]) {
     const { context, page, seen } = await visitor(opts);
     await page.goto(base + "/", { waitUntil: "networkidle0" });
@@ -160,8 +192,7 @@ try {
     await context.close();
   }
 } finally {
-  await browser.close();
-  server.close();
+  servers.forEach((srv) => srv.close());
 }
 console.log(failed === 0 ? "\nAll analytics checks passed." : `\n${failed} check(s) failed.`);
 process.exit(failed === 0 ? 0 : 1);

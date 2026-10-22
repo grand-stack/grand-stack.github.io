@@ -20,7 +20,9 @@
 {{- with site.Params.mixpaneltoken }}
 {{- $mp := resources.Get "js/vendor/mixpanel.min.js" | fingerprint }}
 {{- $snippet := resources.Get "js/vendor/mixpanel-jslib-snippet.min.js" | fingerprint }}
-<meta name="gs-analytics" content="{{ dict "token" . "host" site.Params.mixpanelhost "src" $mp.RelPermalink "snippet" $snippet.RelPermalink "prodHost" (urls.Parse site.BaseURL).Hostname | jsonify }}">
+{{- $recorder := resources.Get "js/vendor/mixpanel-recorder.min.js" | fingerprint }}
+{{- $pct := 50 }}{{ if isset site.Params "mixpanelrecordpercent" }}{{ $pct = int site.Params.mixpanelrecordpercent }}{{ end }}
+<meta name="gs-analytics" content="{{ dict "token" . "host" site.Params.mixpanelhost "src" $mp.RelPermalink "snippet" $snippet.RelPermalink "recorder" $recorder.RelPermalink "recordPercent" $pct "prodHost" (urls.Parse site.BaseURL).Hostname | jsonify }}">
 {{- end }}
 {{- $css := resources.Get "css/main.css" | minify | fingerprint }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}">

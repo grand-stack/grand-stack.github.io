@@ -1,7 +1,7 @@
 // Copyright (c) "Neo4j"
 // Neo4j Sweden AB [http://neo4j.com]
 //
-// Analytics. Does nothing at all unless the build contains a Mixpanel token (a <meta name="gs-analytics"> tag), the page is on the
+// Analytics (events, session replay and heatmaps). Does nothing at all unless the build contains a Mixpanel token (a <meta name="gs-analytics"> tag), the page is on the
 // production host (or has ?analytics=debug), and the browser has not asked not to be tracked (Global Privacy Control or Do Not Track).
 // Then the vendored Mixpanel library is loaded from this site and events are sent to Mixpanel's EU endpoint. The footer tells visitors
 // that continuing means agreeing to the privacy policy.
@@ -127,7 +127,14 @@
     s.async = true;
     s.onload = function () {
       if (!window.mixpanel || !window.mixpanel.init) return;
-      window.mixpanel.init(cfg.token, { api_host: cfg.host, persistence: "localStorage", autocapture: false, record_sessions_percent: 0, track_pageview: false, ip: true, batch_flush_interval_ms: 1000, debug: debug });
+      window.mixpanel.init(cfg.token, {
+        api_host: cfg.host, persistence: "localStorage", autocapture: false, track_pageview: false, ip: true, batch_flush_interval_ms: 1000, debug: debug,
+        // Session replay and heatmaps: a share of visits is recorded (cfg.recordPercent). The recorder is our own vendored copy, fetched only for
+        // visits that are sampled in. Inputs are masked and images, video and audio are blocked (Mixpanel's defaults, stated here on purpose);
+        // console output, network calls, canvas and fonts are never recorded.
+        record_sessions_percent: cfg.recordPercent, recorder_src: cfg.recorder, record_heatmap_data: true,
+        record_mask_inputs: true, record_block_selector: "img, video, audio", record_console: false, record_network: false, record_canvas: false, record_collect_fonts: false
+      });
       pageView(); // calls made now are queued by the loader and replayed when the library arrives
       wire();
     };

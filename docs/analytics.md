@@ -8,6 +8,7 @@ The site sends anonymous usage events to **Mixpanel** (EU region). Visitors are 
 2. **Tracking starts on page load**, on the production host only (the build's `baseURL`), or on any host with `?analytics=debug` in the URL (events then carry `env: "test"`). Continuing to use the site is the agreement, as the footer says.
 3. **The browser's privacy signals are still honoured.** If the browser sends **Global Privacy Control** or **Do Not Track**, nothing is loaded, stored or sent.
 4. Mixpanel's small loader (`mixpanel-jslib-snippet.min.js`) and library (`mixpanel.min.js`) are fetched **from this site** (`assets/js/vendor/`, version pinned in `package.json`), not from Mixpanel's CDN, and events go to `https://api-eu.mixpanel.com` (with IP geolocation). The anonymous id is kept in `localStorage`.
+5. **Session replay and heatmaps** are sampled (see below). The recorder (`mixpanel-recorder.min.js`) is also served from this site and is only downloaded by visits that are sampled in.
 
 The Mixpanel token is public by design (it is visible in the page source of any site that uses Mixpanel). It is kept out of git as the repository **variable** `MIXPANEL_TOKEN` and passed to the build in `.github/workflows/site.yml`.
 
@@ -33,6 +34,16 @@ Every event name starts with **`GS `** so the site's events stay apart from othe
 
 **Where the visit came from.** On the first page view the site registers `initial_path`, `initial_referrer_domain` and `initial_utm_*` as super properties, so every later event in the visit, including the GitHub click, carries them.
 
+## Session replay and heatmaps
+
+Half of the visits (`mixpanelRecordPercent = 50` in `hugo.toml`, or `HUGO_PARAMS_MIXPANELRECORDPERCENT` at build time; `0` switches replay off, `100` records every visit) are recorded so that Mixpanel can show a replay of what the visitor did and heatmaps of where they click and how far they scroll. In Mixpanel, open **Replays** and **Heatmaps**; events from a recorded visit carry `$mp_replay_id`, so a `GS GitHub Click` can open the replay of that visit.
+
+- **Masked and blocked:** every input is masked, and images, video and audio (including the architecture diagrams) are blocked and show as grey placeholders. Text is recorded as displayed; the pages are public documentation.
+- **Not recorded:** console output, network calls, canvas content and fonts.
+- **Same gate as the events:** production host (or `?analytics=debug`), a token in the build, and no Global Privacy Control or Do Not Track.
+- Replays count against the Mixpanel plan's monthly allowance; lower the percentage if that is a concern.
+- Replay is more intrusive than counting page views: Neo4j's privacy team should confirm that the privacy notice linked in the footer covers it.
+
 ## Setting it up
 
 1. Create the repository variable (not a secret): **Settings, Secrets and variables, Actions, Variables, New repository variable** named `MIXPANEL_TOKEN` in `grand-stack/grand-stack.github.io` with the project token. The EU project is assumed: a token from another region needs `mixpanelHost` in `hugo.toml` changed too, or events are dropped.
@@ -49,7 +60,7 @@ npm run vendor -- --check   # the vendored Mixpanel files match the pinned packa
 HUGO_PARAMS_MIXPANELTOKEN=your-token hugo server   # then open http://localhost:1313/?analytics=debug
 ```
 
-The browser test proves: a normal visit sends a Page View with the project token and the first-touch source without any click; the footer notice and its link are on every page; each event above arrives with the expected properties; with Global Privacy Control or Do Not Track nothing is loaded or sent.
+The browser test proves: a normal visit sends a Page View with the project token and the first-touch source without any click; the footer notice and its link are on every page; each event above arrives with the expected properties; with Global Privacy Control or Do Not Track nothing is loaded or sent; with recording at 100 the vendored recorder is served by this site and replay data reaches `api-eu.mixpanel.com/record/` and no other host; at 0 the recorder is not downloaded and nothing is sent to `/record/`.
 
 ## Adding or changing an event
 

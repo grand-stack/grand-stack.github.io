@@ -60,7 +60,8 @@ for (const file of html) {
 }
 if (withAnalytics.length) {
   const cfg = JSON.parse(readFileSync(withAnalytics[0], "utf8").match(/<meta name=["']?gs-analytics["']? content=(?:'([^']*)'|"([^"]*)")/).slice(1).find(Boolean).replace(/&#34;/g, '"'));
-  for (const key of ["src", "snippet"]) if (!existsSync(join(pub, cfg[key]))) problems.push(`analytics ${key} file ${cfg[key]} is not in the build`);
+  for (const key of ["src", "snippet", "recorder"]) if (!existsSync(join(pub, cfg[key]))) problems.push(`analytics ${key} file ${cfg[key]} is not in the build`);
+  if (!(cfg.recordPercent >= 0 && cfg.recordPercent <= 100)) problems.push(`analytics recordPercent is ${cfg.recordPercent}, expected 0 to 100`);
   if (!/^https:\/\/api-eu\.mixpanel\.com\/?$/.test(cfg.host)) problems.push(`analytics host is ${cfg.host}, expected the EU endpoint`);
 } else {
   const leaked = files.filter((f) => /mixpanel/i.test(f) || (f.endsWith(".js") && /GSAnalyticsCore|api-eu\.mixpanel/.test(readFileSync(f, "utf8"))));

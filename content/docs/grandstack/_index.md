@@ -18,10 +18,19 @@ The bundled example is a movie and people app: faceted search with live counts, 
 
 ## Quickstart
 
-You need Docker or Podman with compose. Put the repositories in one folder, side by side (the first three are enough for the default stack):
+You need Git, and Docker or Podman with compose. Clone the repositories **side by side into one folder**, because the compose files build the other repositories from their sibling folders (the first three are enough for the default stack):
+
+```sh
+mkdir grand-stack && cd grand-stack      # any folder name
+git clone https://github.com/grand-stack/grandstack
+git clone https://github.com/grand-stack/grandstack-server
+git clone https://github.com/grand-stack/grandstack-web
+```
+
+The folder then looks like this (the other repositories are cloned later, only if you use that setup):
 
 ```
-grandstack-refresh/        any folder name
+grand-stack/               any folder name
   grandstack/              this repository (compose and docs)
   grandstack-server/       the GraphQL server
   grandstack-web/          the React app
@@ -30,7 +39,7 @@ grandstack-refresh/        any folder name
   grandstack-federation/   optional: Wikipedia subgraph, gateway, link builder (only for the federation setup)
 ```
 
-Then:
+Start the stack from inside the `grandstack` folder:
 
 ```sh
 cd grandstack
@@ -48,9 +57,10 @@ The first start builds the images and loads the sample data. Stop with `docker c
 
 ## Run it with authentication
 
-Opt-in, development only. This adds Keycloak (login), a gateway that checks every token, row-level rules on the server, and a demo client with a permissions playground. `grandstack-web` is not changed; against the gateway it can read but not write.
+Opt-in, development only. Clone the extra repository beside the others first (`git clone https://github.com/grand-stack/grandstack-auth`). This adds Keycloak (login), a gateway that checks every token, row-level rules on the server, and a demo client with a permissions playground. `grandstack-web` is not changed; against the gateway it can read but not write.
 
 ```sh
+cd grandstack            # the umbrella repository, as above
 cp .env.example .env     # once, if you have not already
 docker compose -f compose.yaml -f compose.auth.yaml up --build
 ```
@@ -65,7 +75,7 @@ Reads stay public; writes need a login. See [`grandstack-auth`](/docs/grandstack
 
 ## Run it with agents
 
-Add an MCP server that lets an agent run GraphQL against the (open) server:
+Add an MCP server that lets an agent run GraphQL against the (open) server. Clone the extra repository beside the others first (`git clone https://github.com/grand-stack/grandstack-agents`), then from the `grandstack` folder:
 
 ```sh
 docker compose -f compose.yaml -f compose.agents.yaml up --build
@@ -76,7 +86,7 @@ It is read-only by default; `AGENTS_ALLOW_MUTATIONS=true` enables writes. The en
 
 ## Run it with federation
 
-Add a Wikipedia subgraph and a gateway, so one query returns movie data from Neo4j together with a Wikipedia summary:
+Add a Wikipedia subgraph and a gateway, so one query returns movie data from Neo4j together with a Wikipedia summary. Clone the extra repository beside the others first (`git clone https://github.com/grand-stack/grandstack-federation`), then from the `grandstack` folder:
 
 ```sh
 docker compose -f compose.yaml -f compose.federation.yaml up --build

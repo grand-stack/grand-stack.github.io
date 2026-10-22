@@ -1,8 +1,8 @@
 {
-  "grandstack": "v0.10.4",
-  "grandstack-server": "v0.9.3",
-  "grandstack-web": "v0.5.4",
-  "grandstack-auth": "v0.1.4",
-  "grandstack-agents": "v0.1.6",
-  "grandstack-federation": "v0.1.4"
+  "grandstack": "v0.10.5",
+  "grandstack-server": "v0.9.4",
+  "grandstack-web": "v0.5.5",
+  "grandstack-auth": "v0.1.5",
+  "grandstack-agents": "v0.1.7",
+  "grandstack-federation": "v0.1.5"
 }

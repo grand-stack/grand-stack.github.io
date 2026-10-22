@@ -25,9 +25,11 @@ A movie and people search app for grandstack-server (GraphQL over Neo4j), built 
 
 The web app needs the server and Neo4j, so the easiest way is the `grandstack` umbrella repo: `docker compose up --build`, then open http://localhost:3000.
 
-For development, with the server already running on port 4000:
+For development you need Node 22 or later and the server already running on port 4000 (for example from the umbrella stack). Clone this repository, go into the folder, then:
 
 ```sh
+git clone https://github.com/grand-stack/grandstack-web
+cd grandstack-web
 npm ci
 npm run dev        # http://localhost:3000
 ```

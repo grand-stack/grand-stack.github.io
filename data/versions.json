@@ -3,6 +3,6 @@
   "grandstack-server": "v0.9.3",
   "grandstack-web": "v0.5.4",
   "grandstack-auth": "v0.1.4",
-  "grandstack-agents": "v0.1.5",
+  "grandstack-agents": "v0.1.6",
   "grandstack-federation": "v0.1.4"
 }

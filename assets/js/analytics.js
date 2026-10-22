@@ -24,7 +24,10 @@
   var started = false;
   var wired = false;
 
+  // Every event name starts with "GS " so these events stay apart from other sites' events in a shared Mixpanel project.
+  var PREFIX = "GS ";
   function track(name, props, beacon) {
+    name = PREFIX + name;
     var all = props || {};
     all.page_path = all.page_path || path;
     // always go through window.mixpanel: it is the loader's queue until the library arrives, and the library itself after that

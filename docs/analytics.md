@@ -13,23 +13,23 @@ The Mixpanel token is public by design (it is visible in the page source of any 
 
 ## Events
 
-Every event also carries `page_path` and Mixpanel's own properties (browser, operating system, referrer, and the location worked out from the IP address). Visitors are anonymous: there is no `identify` call and nothing the visitor types is sent.
+Every event name starts with **`GS `** so the site's events stay apart from other sites' events in a shared Mixpanel project (the prefix is added in one place, `track()` in `assets/js/analytics.js`). Every event also carries `page_path` and Mixpanel's own properties (browser, operating system, referrer, and the location worked out from the IP address). Visitors are anonymous: there is no `identify` call and nothing the visitor types is sent.
 
 | Event | When | Properties |
 | --- | --- | --- |
-| `Page View` | every page | `title`, `section` (home, quickstart, docs, examples, agents, other), `repo` (docs pages), `referrer_domain`, `utm_*`, `theme`, `viewport` (mobile, desktop), `page_in_visit`, `env` |
-| `GitHub Click` | a click, middle-click or Ctrl/Cmd-click on any link to github.com | `destination_url`, `org_repo` (`grand-stack/grandstack-server`, or `grand-stack` for the organisation), `link_kind` (org, repo, file, issues, release, other), `link_text`, `placement`, `env` |
-| `Copy Command` | the copy button on a command or code block | `command` (the home page tab id such as `p-default`, or `code-block`), `text_start` (first 60 characters), `placement` |
-| `Setup Tab` | a setup tab on the home page | `tab` |
-| `Example Filter` | a tag on the examples page | `tag` |
-| `Theme Toggle` | the light/dark button | `theme` |
-| `Docs Navigation` | a link in the docs sidebar, the previous/next links or the breadcrumb | `via` (sidebar, next, previous, breadcrumb), `from_path`, `to_path` |
-| `Scroll Depth` | 25, 50, 75 and 100 percent of the page, once each per page view | `percent` |
-| `Time On Page` | when the page is left or hidden, if the visitor was on it 5 seconds or more | `seconds` (visible time) |
+| `GS Page View` | every page | `title`, `section` (home, quickstart, docs, examples, agents, other), `repo` (docs pages), `referrer_domain`, `utm_*`, `theme`, `viewport` (mobile, desktop), `page_in_visit`, `env` |
+| `GS GitHub Click` | a click, middle-click or Ctrl/Cmd-click on any link to github.com | `destination_url`, `org_repo` (`grand-stack/grandstack-server`, or `grand-stack` for the organisation), `link_kind` (org, repo, file, issues, release, other), `link_text`, `placement`, `env` |
+| `GS Copy Command` | the copy button on a command or code block | `command` (the home page tab id such as `p-default`, or `code-block`), `text_start` (first 60 characters), `placement` |
+| `GS Setup Tab` | a setup tab on the home page | `tab` |
+| `GS Example Filter` | a tag on the examples page | `tag` |
+| `GS Theme Toggle` | the light/dark button | `theme` |
+| `GS Docs Navigation` | a link in the docs sidebar, the previous/next links or the breadcrumb | `via` (sidebar, next, previous, breadcrumb), `from_path`, `to_path` |
+| `GS Scroll Depth` | 25, 50, 75 and 100 percent of the page, once each per page view | `percent` |
+| `GS Time On Page` | when the page is left or hidden, if the visitor was on it 5 seconds or more | `seconds` (visible time) |
 
-`GitHub Click` and `Docs Navigation` and `Time On Page` use `sendBeacon`, so they are delivered even as the page unloads.
+`GS GitHub Click`, `GS Docs Navigation` and `GS Time On Page` use `sendBeacon`, so they are delivered even as the page unloads.
 
-**Placement values** for `GitHub Click`: `header`, `footer`, `home-hero`, `home-card`, `docs-source` (the "Source" link at the bottom of a docs page), `docs-body`, `quickstart`, `agents`, `other`; an element can set its own with `data-placement="..."`.
+**Placement values** for `GS GitHub Click`: `header`, `footer`, `home-hero`, `home-card`, `docs-source` (the "Source" link at the bottom of a docs page), `docs-body`, `quickstart`, `agents`, `other`; an element can set its own with `data-placement="..."`.
 
 **Where the visit came from.** On the first page view the site registers `initial_path`, `initial_referrer_domain` and `initial_utm_*` as super properties, so every later event in the visit, including the GitHub click, carries them.
 

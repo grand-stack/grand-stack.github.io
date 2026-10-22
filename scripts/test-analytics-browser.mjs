@@ -88,8 +88,8 @@ try {
     const note = await page.$eval(".privacy-note", (e) => ({ text: e.textContent.trim(), href: e.querySelector("a").href })).catch(() => null);
     check("the footer says: By continuing, you agree to our Privacy Policies", note?.text === "By continuing, you agree to our Privacy Policies.", JSON.stringify(note));
     check("the Privacy Policies link goes to Neo4j's privacy notice", note?.href === "https://neo4j.com/legal-terms/privacy-notice/", note?.href);
-    await until(() => find(seen, "Page View").length > 0);
-    const pv = find(seen, "Page View")[0];
+    await until(() => find(seen, "GS Page View").length > 0);
+    const pv = find(seen, "GS Page View")[0];
     check("Mixpanel's loader and library are served by the site itself, once each", seen.scripts.length === 2, seen.scripts.join(", "));
     check("a Page View is sent to the EU endpoint with the project token, without any click", !!pv && pv.properties.token === TOKEN);
     check("Page View carries section, UTM and viewport", !!pv && pv.properties.section === "home" && pv.properties.utm_source === "newsletter" && pv.properties.viewport === "desktop", JSON.stringify(pv?.properties));
@@ -99,21 +99,21 @@ try {
     check("the notice is in the footer of every page (checked on a docs page)", docNote === "By continuing, you agree to our Privacy Policies.");
     await page.goto(base + "/?utm_source=newsletter&utm_medium=email", { waitUntil: "networkidle0" });
 
-    await page.click(".cmd .copy"); await until(() => find(seen, "Copy Command").length > 0);
-    check("Copy Command is sent with which command", find(seen, "Copy Command").some((e) => e.properties.command === "p-default" && /docker compose/.test(e.properties.text_start)));
-    await page.click("#t-agents"); await until(() => find(seen, "Setup Tab").length > 0);
-    check("Setup Tab is sent", find(seen, "Setup Tab").some((e) => e.properties.tab === "t-agents"));
-    await page.click(".theme-toggle"); await until(() => find(seen, "Theme Toggle").length > 0);
-    check("Theme Toggle is sent", find(seen, "Theme Toggle").length === 1);
+    await page.click(".cmd .copy"); await until(() => find(seen, "GS Copy Command").length > 0);
+    check("Copy Command is sent with which command", find(seen, "GS Copy Command").some((e) => e.properties.command === "p-default" && /docker compose/.test(e.properties.text_start)));
+    await page.click("#t-agents"); await until(() => find(seen, "GS Setup Tab").length > 0);
+    check("Setup Tab is sent", find(seen, "GS Setup Tab").some((e) => e.properties.tab === "t-agents"));
+    await page.click(".theme-toggle"); await until(() => find(seen, "GS Theme Toggle").length > 0);
+    check("Theme Toggle is sent", find(seen, "GS Theme Toggle").length === 1);
 
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await until(() => find(seen, "Scroll Depth").some((e) => e.properties.percent === 100));
-    check("Scroll Depth reaches 100 and each step is sent once", [25, 50, 75, 100].every((p) => find(seen, "Scroll Depth").filter((e) => e.properties.percent === p).length === 1), find(seen, "Scroll Depth").map((e) => e.properties.percent).join(","));
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await until(() => find(seen, "GS Scroll Depth").some((e) => e.properties.percent === 100));
+    check("Scroll Depth reaches 100 and each step is sent once", [25, 50, 75, 100].every((p) => find(seen, "GS Scroll Depth").filter((e) => e.properties.percent === p).length === 1), find(seen, "GS Scroll Depth").map((e) => e.properties.percent).join(","));
 
     // GitHub click from the header (navigates away: the beacon must still arrive)
     await page.evaluate(() => window.scrollTo(0, 0));
     await Promise.all([page.waitForNavigation().catch(() => {}), page.click('.site-header a[href^="https://github.com"]')]);
-    await until(() => find(seen, "GitHub Click").length > 0);
-    const gh = find(seen, "GitHub Click")[0];
+    await until(() => find(seen, "GS GitHub Click").length > 0);
+    const gh = find(seen, "GS GitHub Click")[0];
     check("GitHub Click from the header: org, kind and placement", !!gh && gh.properties.org_repo === "grand-stack" && gh.properties.link_kind === "org" && gh.properties.placement === "header", JSON.stringify(gh?.properties));
     check("GitHub Click carries the first-touch source", !!gh && gh.properties.initial_utm_source === "newsletter");
 
@@ -121,26 +121,26 @@ try {
     await page.goto(base + "/docs/grandstack-server/", { waitUntil: "networkidle0" });
     await wait(400);
     await page.evaluate(() => document.querySelector('.sidebar a[href="/docs/grandstack-server/mutations/"]').click());
-    await until(() => find(seen, "Docs Navigation").length > 0);
-    check("Docs Navigation via the sidebar", find(seen, "Docs Navigation").some((e) => e.properties.via === "sidebar" && e.properties.to_path === "/docs/grandstack-server/mutations/"));
+    await until(() => find(seen, "GS Docs Navigation").length > 0);
+    check("Docs Navigation via the sidebar", find(seen, "GS Docs Navigation").some((e) => e.properties.via === "sidebar" && e.properties.to_path === "/docs/grandstack-server/mutations/"));
     await page.goto(base + "/docs/grandstack-server/mutations/", { waitUntil: "networkidle0" });
     await Promise.all([page.waitForNavigation().catch(() => {}), page.evaluate(() => document.querySelector(".source a").click())]);
-    await until(() => find(seen, "GitHub Click").some((e) => e.properties.placement === "docs-source"));
-    const src = find(seen, "GitHub Click").find((e) => e.properties.placement === "docs-source");
+    await until(() => find(seen, "GS GitHub Click").some((e) => e.properties.placement === "docs-source"));
+    const src = find(seen, "GS GitHub Click").find((e) => e.properties.placement === "docs-source");
     check("GitHub Click from a docs 'source' link: repo, file kind, placement", !!src && src.properties.org_repo === "grand-stack/grandstack-server" && src.properties.link_kind === "file", JSON.stringify(src?.properties));
 
     // examples filter and time on page
     await page.goto(base + "/examples/", { waitUntil: "networkidle0" });
-    await page.click('.chip[data-tag="query"]'); await until(() => find(seen, "Example Filter").length > 0);
-    check("Example Filter is sent", find(seen, "Example Filter").some((e) => e.properties.tag === "query"));
+    await page.click('.chip[data-tag="query"]'); await until(() => find(seen, "GS Example Filter").length > 0);
+    check("Example Filter is sent", find(seen, "GS Example Filter").some((e) => e.properties.tag === "query"));
     await wait(5200);
     await page.evaluate(() => { Object.defineProperty(document, "visibilityState", { get: () => "hidden", configurable: true }); document.dispatchEvent(new Event("visibilitychange")); });
-    await until(() => find(seen, "Time On Page").length > 0);
-    check("Time On Page is sent when the page is left (5 s or more)", find(seen, "Time On Page").some((e) => e.properties.seconds >= 5));
+    await until(() => find(seen, "GS Time On Page").length > 0);
+    check("Time On Page is sent when the page is left (5 s or more)", find(seen, "GS Time On Page").some((e) => e.properties.seconds >= 5));
 
     // moving to another page keeps tracking (a new page view, same visit)
-    await page.goto(base + "/quickstart/", { waitUntil: "networkidle0" }); await until(() => find(seen, "Page View").some((e) => e.properties.section === "quickstart"));
-    const second = find(seen, "Page View").find((e) => e.properties.section === "quickstart");
+    await page.goto(base + "/quickstart/", { waitUntil: "networkidle0" }); await until(() => find(seen, "GS Page View").some((e) => e.properties.section === "quickstart"));
+    const second = find(seen, "GS Page View").find((e) => e.properties.section === "quickstart");
     check("a later page is a new Page View in the same visit, with the first-touch source", !!second && second.properties.page_in_visit >= 2 && second.properties.initial_utm_source === "newsletter", JSON.stringify(second?.properties));
     await context.close(); }
 

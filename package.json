@@ -14,7 +14,7 @@
     "build": "hugo --gc --minify",
     "check": "node scripts/check-site.mjs",
     "verify-examples": "node scripts/verify-examples.mjs",
-    "test": "node --test test/",
+    "test": "node --test \"test/*.test.mjs\"",
     "tags": "node scripts/latest-tags.mjs"
   }
 }

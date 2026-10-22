@@ -24,3 +24,4 @@ Compose stack plus the overview docs for GRANDstack (GraphQL on Neo4j: `grandsta
 
 - New code files need the copyright header (two lines: `Copyright (c) "Neo4j"` and `Neo4j Sweden AB [http://neo4j.com]`, in the file's comment syntax). Run `node ../grandstack/scripts/add-headers.mjs` to add it everywhere; `--check` lists what is missing. Generated files are exempt.
 - Releases use the **release-cut** workflow (Actions tab), which sets the version in every `package.json`, tags and publishes. Do not bump versions or push tags by hand; see `grandstack/docs/releasing.md`.
+- Base images in Dockerfiles and compose files are pinned to an exact version **and** a digest (`image:1.2.3@sha256:...`), never a floating tag such as `latest` or `24-slim`, so a rebuilt image cannot silently change or be swapped. Dependabot proposes updates to both; take them through a pull request that passes CI. To pin a new image, look up the digest of the multi-arch index (not of one platform).

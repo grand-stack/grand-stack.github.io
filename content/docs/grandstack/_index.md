@@ -103,7 +103,7 @@ Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (t
 | `grandstack-web` | React app with typed operations (open, no login) | its `README.md` and `docs/architecture.md` |
 | `grandstack-auth` | Gateway, Keycloak dev realm, auth schema rules, demo client, and the exercise for adding login to `grandstack-web` | its `README.md` and `docs/how-it-works.md` |
 | `grandstack-agents` | MCP server with generic GraphQL tools, a direct agent-loop example, and example code for using auth | its `README.md` and `docs/how-it-works.md` |
-| `grand-stack.github.io` | The website (https://grandstack.ai): Hugo, a generated copy of every repo's docs, examples, llms.txt | its `README.md` |
+| `grand-stack.github.io` | The website (https://www.grandstack.ai): Hugo, a generated copy of every repo's docs, examples, llms.txt | its `README.md` |
 | `grandstack-federation` | Wikipedia subgraph, gateway and supergraph, link builder; the server becomes a subgraph | its `README.md` and `docs/how-it-works.md` |
 
 ## Documentation
@@ -117,7 +117,7 @@ Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (t
 | [Versioning and releases](/docs/grandstack/versioning-and-releases/) | Tags, what is released, how to cut a release |
 | [Releasing, CI and the website](/docs/grandstack/releasing/) | The GitHub workflows: checks on every commit, the release button, images, how a release rebuilds grandstack.ai |
 | [Roadmap](https://github.com/grand-stack/grandstack/blob/main/docs/roadmap.md) | What is built and what is planned |
-| [llms.txt](https://github.com/grand-stack/grandstack/blob/main/llms.txt) | An index of all of this for agents (the public copy is https://grandstack.ai/llms.txt) |
+| [llms.txt](https://github.com/grand-stack/grandstack/blob/main/llms.txt) | An index of all of this for agents (the public copy is https://www.grandstack.ai/llms.txt) |
 
 The sample data has real titles, casts and relationships; ratings and runtimes are approximate.
 
@@ -125,4 +125,4 @@ Last verified: grandstack v0.10.4 with grandstack-server v0.9.3, grandstack-web 
 
 ## Licence
 
-Apache License 2.0. See [LICENSE](https://github.com/grand-stack/grandstack/blob/main/LICENSE) and [NOTICE](https://github.com/grand-stack/grandstack/blob/main/NOTICE). The same licence applies to every GRANDstack repository and to [grandstack.ai](https://grandstack.ai).
+Apache License 2.0. See [LICENSE](https://github.com/grand-stack/grandstack/blob/main/LICENSE) and [NOTICE](https://github.com/grand-stack/grandstack/blob/main/NOTICE). The same licence applies to every GRANDstack repository and to [grandstack.ai](https://www.grandstack.ai).

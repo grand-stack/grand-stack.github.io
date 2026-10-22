@@ -1,0 +1,45 @@
+{{- $repoID := .Params.repo }}
+{{- $current := .RelPermalink }}
+{{- $repo := dict }}
+{{- range hugo.Data.docs.repos }}{{ if eq .id $repoID }}{{ $repo = . }}{{ end }}{{ end }}
+<div class="wrap docs">
+  <aside class="sidebar" id="sidebar" aria-label="Documentation">
+    {{- range hugo.Data.docs.repos }}
+    {{- if eq .id $repoID }}
+    <h4>{{ .id }}</h4>
+    {{- $section := "" }}
+    <ul>
+      {{- range .pages }}
+      {{- if ne .section $section }}{{ $section = .section }}</ul><div class="sect">{{ .section }}</div><ul>{{ end }}
+      <li><a href="{{ .url }}"{{ if eq .url $current }} aria-current="page"{{ end }}>{{ .title }}</a></li>
+      {{- end }}
+    </ul>
+    {{- end }}
+    {{- end }}
+    <h4>Other repositories</h4>
+    <ul>
+      {{- range hugo.Data.docs.repos }}{{ if ne .id $repoID }}<li><a href="/docs/{{ .id }}/">{{ .id }}</a></li>{{ end }}{{ end }}
+    </ul>
+  </aside>
+  <article class="prose">
+    <button class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Show pages in this repository" style="width:auto;padding:0 .8rem;margin-bottom:1rem">Pages</button>
+    <div class="crumbs"><a href="/docs/">docs</a> / <a href="/docs/{{ $repoID }}/">{{ $repoID }}</a>{{ if .Params.section }} / {{ .Params.section }}{{ end }}</div>
+    <h1>{{ .Title }}</h1>
+    {{ .Content }}
+    {{- with .Params.source }}
+    <p class="source">Source: <a href="https://github.com/{{ site.Params.githubOrg }}/{{ $repoID }}/blob/main/{{ . }}">{{ $repoID }}/{{ . }}</a> (this page is a copy; edit it in the repository)</p>
+    {{- end }}
+    {{- $pages := $repo.pages }}
+    {{- $prev := dict }}{{ $next := dict }}
+    {{- range $i, $p := $pages }}
+      {{- if eq $p.url $current }}
+        {{- if gt $i 0 }}{{ $prev = index $pages (sub $i 1) }}{{ end }}
+        {{- if lt (add $i 1) (len $pages) }}{{ $next = index $pages (add $i 1) }}{{ end }}
+      {{- end }}
+    {{- end }}
+    <nav class="pager" aria-label="Previous and next page">
+      {{- with $prev }}<a class="prev" href="{{ .url }}"><small>← previous</small>{{ .title }}</a>{{ end }}
+      {{- with $next }}<a class="next" href="{{ .url }}"><small>next →</small>{{ .title }}</a>{{ end }}
+    </nav>
+  </article>
+</div>

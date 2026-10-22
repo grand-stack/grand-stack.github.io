@@ -1,0 +1,22 @@
+# GRANDstack
+
+> GraphQL on Neo4j, for developers and agents. A Neo4j graph, a GraphQL API generated from one schema file (@neo4j/graphql v7 on GraphQL Yoga), a typed React app, and an MCP server so agents can use the same API. Small repositories you can clone and run in Docker. Opt-in layers: auth (Keycloak and a gateway), agents (MCP), federation (a Wikipedia subgraph). The default stack has no authentication: run it locally and do not expose it. Licensed Apache-2.0.
+
+Source: https://github.com/{{ site.Params.githubOrg }}. Everything below is a copy of the documentation in those repositories; the full text of all of it is at {{ "llms-full.txt" | absURL }}.
+
+## Start here
+
+- [Quickstart]({{ "quickstart/" | absURL }}): clone the repos, start the stack, query the API, connect an agent
+- [For agents]({{ "agents/" | absURL }}): what to read, how to connect, what to be careful about
+- [Examples]({{ "examples/" | absURL }}): runnable queries, mutations, MCP and federation examples
+- [Roadmap]({{ "roadmap/" | absURL }}): what is built and what is planned
+{{ range hugo.Data.docs.repos }}
+## {{ .id }}
+
+{{ .blurb }}
+{{ range .pages }}
+{{- $path := strings.TrimSuffix "/" (strings.TrimPrefix "/" .url) }}
+{{- $p := site.GetPage $path }}
+- [{{ .title }}]({{ .url | absURL }}){{ with $p }}{{ with .Description }}: {{ . }}{{ end }}{{ end }}
+{{- end }}
+{{ end }}

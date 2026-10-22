@@ -1,0 +1,167 @@
+[
+ {
+  "id": "count",
+  "stack": "default",
+  "tags": [
+   "query"
+  ],
+  "title": "Count the films",
+  "text": "Connection fields return a totalCount next to the rows.",
+  "needs": "the default stack",
+  "link": "/docs/grandstack-server/schema-guide/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ moviesConnection { totalCount } }\"}'",
+  "expect": "\"totalCount\":152",
+  "output": "{\"data\":{\"moviesConnection\":{\"totalCount\":152}}}"
+ },
+ {
+  "id": "top-directors",
+  "stack": "default",
+  "tags": [
+   "query",
+   "schema"
+  ],
+  "title": "Who directed the most films?",
+  "text": "Film counts are stored on each person (and refreshed after every mutation), so this is one sorted query.",
+  "needs": "the default stack",
+  "link": "/docs/grandstack-agents/schema-design-for-agents/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ people(sort: [{ directedCount: DESC }], limit: 3) { name directedCount } }\"}'",
+  "expect": "Christopher Nolan",
+  "output": "{\"data\":{\"people\":[{\"name\":\"Christopher Nolan\",\"directedCount\":8},{\"name\":\"Steven Spielberg\",\"directedCount\":7},{\"name\":\"Quentin Tarantino\",\"directedCount\":6}]}}"
+ },
+ {
+  "id": "filter",
+  "stack": "default",
+  "tags": [
+   "query"
+  ],
+  "title": "Filter and nest",
+  "text": "Filters use operators such as contains (case-sensitive), eq and gte; relationships nest.",
+  "needs": "the default stack",
+  "link": "/docs/grandstack-server/schema-guide/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ movies(where: { title: { contains: \\\"Matrix\\\" } }) { title released genres { name } } }\"}'",
+  "expect": "The Matrix Reloaded",
+  "output": "{\"data\":{\"movies\":[{\"title\":\"The Matrix\",\"released\":1999,\"genres\":[{\"name\":\"Action\"},{\"name\":\"Sci-Fi\"}]},{\"title\":\"The Matrix Reloaded\",\"released\":2003,\"genres\":[{\"name\":\"Action\"},{\"name\":\"Sci-Fi\"}]}]}}"
+ },
+ {
+  "id": "typo",
+  "stack": "default",
+  "tags": [
+   "query",
+   "agents"
+  ],
+  "title": "Read the error, fix the statement",
+  "text": "GraphQL answers HTTP 200 with an errors array; the message says what to fix. This is the loop an agent follows.",
+  "needs": "the default stack",
+  "link": "/docs/grandstack-agents/direct-graphql/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ movies(where: { titel: \\\"x\\\" }) { title } }\"}'",
+  "expect": "Did you mean",
+  "output": "{\"errors\":[{\"message\":\"Field \\\"titel\\\" is not defined by type \\\"MovieWhere\\\". Did you mean \\\"title\\\"?\",\"locations\":[{\"line\":1,\"column\":19}],\"extensions\":{\"code\":\"GRAPHQL_VALIDATION_FAILED\"}}]}"
+ },
+ {
+  "id": "mutate",
+  "stack": "default",
+  "tags": [
+   "mutation"
+  ],
+  "title": "Create a film, then remove it",
+  "text": "Writes are open on the default stack. The first statement creates a film with a connected actor; the second deletes it again. Always filter a delete.",
+  "needs": "the default stack",
+  "link": "/docs/grandstack-server/mutations/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"mutation { createMovies(input: [{ title: \\\"ZZ Example\\\", released: 2031 }]) { movies { title released } } }\"}'\ncurl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"mutation { deleteMovies(where: { title: { eq: \\\"ZZ Example\\\" } }) { nodesDeleted } }\"}'",
+  "expect": "\"nodesDeleted\":1",
+  "output": "{\"data\":{\"createMovies\":{\"movies\":[{\"title\":\"ZZ Example\",\"released\":2031}]}}}{\"data\":{\"deleteMovies\":{\"nodesDeleted\":1}}}"
+ },
+ {
+  "id": "mcp-tools",
+  "stack": "agents",
+  "tags": [
+   "agents",
+   "mcp"
+  ],
+  "title": "List the MCP tools",
+  "text": "The MCP server speaks JSON-RPC over HTTP; send both Accept types. It is stateless, so no handshake is needed.",
+  "needs": "the agents setup",
+  "link": "/docs/grandstack-agents/mcp-server/",
+  "command": "curl -s localhost:4100/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\\n  -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}'",
+  "expect": "run_mutation",
+  "truncate": true,
+  "output": "event: message\ndata: {\"result\":{\"tools\":[{\"name\":\"get_schema\",\"description\":\"Summary of the GraphQL API: root query and mutation fields with their arguments, and the object types the schema defines with their fields and descriptions. G ..."
+ },
+ {
+  "id": "mcp-query",
+  "stack": "agents",
+  "tags": [
+   "agents",
+   "mcp",
+   "query"
+  ],
+  "title": "Run a query through MCP",
+  "text": "run_query returns the JSON result as text.",
+  "needs": "the agents setup",
+  "link": "/docs/grandstack-agents/mcp-server/",
+  "command": "curl -s localhost:4100/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\\n  -d '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"run_query\",\"arguments\":{\"query\":\"{ moviesConnection { totalCount } }\"}}}'",
+  "expect": "totalCount",
+  "output": "event: message\ndata: {\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"data\\\":{\\\"moviesConnection\\\":{\\\"totalCount\\\":152}}}\"}],\"isError\":false},\"jsonrpc\":\"2.0\",\"id\":2}"
+ },
+ {
+  "id": "mcp-readonly",
+  "stack": "agents",
+  "tags": [
+   "agents",
+   "mcp",
+   "mutation"
+  ],
+  "title": "Mutations are off by default",
+  "text": "The refusal comes back as text with isError, so the agent can read it. Set AGENTS_ALLOW_MUTATIONS=true to allow writes.",
+  "needs": "the agents setup",
+  "link": "/docs/grandstack-agents/guardrails/",
+  "command": "curl -s localhost:4100/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\\n  -d '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"run_mutation\",\"arguments\":{\"query\":\"mutation { deleteMovies { nodesDeleted } }\"}}}'",
+  "expect": "Mutations are disabled",
+  "output": "event: message\ndata: {\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Mutations are disabled. This server is read-only by default: start it with ALLOW_MUTATIONS=true to let an agent change data. See docs/guardrails.md.\"}],\"isError\":true},\"jsonrpc\":\"2.0\",\"id\":3}"
+ },
+ {
+  "id": "federation-heat",
+  "stack": "federation",
+  "tags": [
+   "federation",
+   "query"
+  ],
+  "title": "One query, two sources",
+  "text": "The gateway asks Neo4j for the film and Wikipedia (through the Wikipedia subgraph) for the summary.",
+  "needs": "the federation setup and internet",
+  "link": "/docs/grandstack-federation/how-it-works/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ movies(where: { title: { eq: \\\"Heat\\\" } }) { title released wikipedia { description pageUrl } } }\"}'",
+  "expect": "Michael Mann",
+  "output": "{\"data\":{\"movies\":[{\"title\":\"Heat\",\"released\":1995,\"wikipedia\":{\"description\":\"1995 crime drama film by Michael Mann\",\"pageUrl\":\"https://en.wikipedia.org/wiki/Heat_(1995_film)\"}}]}}"
+ },
+ {
+  "id": "federation-null",
+  "stack": "federation",
+  "tags": [
+   "federation",
+   "query"
+  ],
+  "title": "No link, no error",
+  "text": "A person with no Wikipedia link returns null for the Wikipedia fields, with no error.",
+  "needs": "the federation setup",
+  "link": "/docs/grandstack-federation/linking/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"{ people(where: { name: { eq: \\\"Madonna\\\" } }) { name wikipediaTitle wikipedia { title } } }\"}'",
+  "expect": "\"wikipedia\":null",
+  "output": "{\"data\":{\"people\":[{\"name\":\"Madonna\",\"wikipediaTitle\":null,\"wikipedia\":null}]}}"
+ },
+ {
+  "id": "auth-anon",
+  "stack": "auth",
+  "tags": [
+   "auth",
+   "mutation"
+  ],
+  "title": "An anonymous write is refused",
+  "text": "With grandstack-auth, reads are public but writes need a token. The gateway answers before the request reaches the server.",
+  "needs": "the auth setup",
+  "link": "/docs/grandstack-auth/how-it-works/",
+  "command": "curl -s localhost:4000/graphql -H 'content-type: application/json' \\\n  -d '{\"query\": \"mutation { deleteMovies(where: { title: { eq: \\\"ZZ none\\\" } }) { nodesDeleted } }\"}'",
+  "expect": "Unauthenticated",
+  "output": "{\"errors\":[{\"message\":\"Unauthenticated: log in to change data\",\"extensions\":{\"code\":\"UNAUTHENTICATED\"}}]}"
+ }
+]

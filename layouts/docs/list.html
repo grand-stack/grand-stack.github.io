@@ -1,0 +1,15 @@
+{{ define "main" }}
+{{- if .Params.repo }}
+{{ partial "docs-page.html" . }}
+{{- else }}
+<div class="wrap"><div class="page-title-area prose" style="max-width:var(--measure)">
+  <h1>Documentation</h1>
+  <p>Six repositories, each with its own docs. Start with the umbrella's architecture page, then pick the layer you are working on. Every repo also has an <strong>AGENTS.md</strong> for coding agents.</p>
+  <div class="grid" style="margin-top:1.6rem">
+    {{- range hugo.Data.docs.repos }}
+    <a class="card" href="/docs/{{ .id }}/"><h3>{{ .id }}</h3><p>{{ .blurb }}</p><span class="more">{{ len .pages }} pages →</span></a>
+    {{- end }}
+  </div>
+</div></div>
+{{- end }}
+{{ end }}

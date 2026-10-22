@@ -1,0 +1,27 @@
+{{ define "main" }}
+<section class="section" style="padding-top:3rem">
+  <div class="wrap">
+    <div class="kicker">examples</div>
+    <h2 class="title">Things to try.</h2>
+    <p class="sub">Each example names the setup it needs. The commands are run against a real stack by <code>scripts/verify-examples.mjs</code>, and the output shown is what they returned.</p>
+    {{- $tags := slice }}
+    {{- range hugo.Data.examples }}{{ range .tags }}{{ $tags = $tags | append . }}{{ end }}{{ end }}
+    <div class="chips" role="group" aria-label="Filter by tag">
+      <button class="chip" type="button" data-tag="all" aria-pressed="true">all</button>
+      {{- range $tags | uniq | sort }}<button class="chip" type="button" data-tag="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end }}
+    </div>
+    <div class="grid two">
+      {{- range hugo.Data.examples }}
+      <div class="card" data-example data-tags="{{ delimit .tags " " }}">
+        <div class="tags">{{ range .tags }}<span>{{ . }}</span>{{ end }}</div>
+        <h3>{{ .title }}</h3>
+        <p>{{ .text }}</p>
+        <pre><code>{{ .command }}</code></pre>
+        <pre><code>{{ .output }}</code></pre>
+        <p style="margin-top:.8rem;margin-bottom:0;font-size:.85rem"><strong>Needs:</strong> {{ .needs }}{{ with .link }} · <a href="{{ . }}">docs →</a>{{ end }}</p>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{ end }}

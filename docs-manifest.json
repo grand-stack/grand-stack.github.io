@@ -1,0 +1,298 @@
+{
+  "githubBranch": "main",
+  "workspace": "..",
+  "repos": [
+    {
+      "id": "grandstack",
+      "blurb": "The umbrella: compose files for every setup, the overview, architecture, build-your-own-app tutorial and agent guide.",
+      "pages": [
+        {
+          "file": "README.md",
+          "section": "Start",
+          "slug": "index"
+        },
+        {
+          "file": "docs/architecture.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/build-your-own-app.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/configuration.md",
+          "section": "Reference"
+        },
+        {
+          "file": "docs/agents.md",
+          "section": "Agents"
+        },
+        {
+          "file": "AGENTS.md",
+          "section": "Agents",
+          "slug": "agents-md"
+        },
+        {
+          "file": "docs/roadmap.md",
+          "section": "Project"
+        },
+        {
+          "file": "docs/versioning-and-releases.md",
+          "section": "Project"
+        }
+      ]
+    },
+    {
+      "id": "grandstack-server",
+      "blurb": "The GraphQL server: Neo4j and a schema file in, a GraphQL API out. Seeding, mutations, federation switch.",
+      "pages": [
+        {
+          "file": "README.md",
+          "section": "Start",
+          "slug": "index"
+        },
+        {
+          "file": "docs/how-it-works.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/schema-guide.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/mutations.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/seeding.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/recipes.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/configuration.md",
+          "section": "Reference"
+        },
+        {
+          "file": "docs/schema-reference.md",
+          "section": "Reference"
+        },
+        {
+          "file": "docs/troubleshooting.md",
+          "section": "Help"
+        },
+        {
+          "file": "AGENTS.md",
+          "section": "Agents",
+          "slug": "agents-md"
+        }
+      ]
+    },
+    {
+      "id": "grandstack-web",
+      "blurb": "The React app: faceted search, compare, graph views, people pages and full create, edit and delete, with typed operations.",
+      "pages": [
+        {
+          "file": "README.md",
+          "section": "Start",
+          "slug": "index"
+        },
+        {
+          "file": "docs/architecture.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/features.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/customising.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/recipes.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/testing.md",
+          "section": "Help"
+        },
+        {
+          "file": "AGENTS.md",
+          "section": "Agents",
+          "slug": "agents-md"
+        }
+      ]
+    },
+    {
+      "id": "grandstack-auth",
+      "blurb": "Opt-in auth: a gateway that validates tokens and enforces permissions, row-level rules, a Keycloak dev realm and a demo client.",
+      "pages": [
+        {
+          "file": "README.md",
+          "section": "Start",
+          "slug": "index"
+        },
+        {
+          "file": "docs/how-it-works.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/role-and-scope-model.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/keycloak.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/client.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/swapping-providers.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/auth0.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/recipes.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/exercise-add-auth-to-grandstack-web.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/testing.md",
+          "section": "Help"
+        },
+        {
+          "file": "docs/troubleshooting.md",
+          "section": "Help"
+        },
+        {
+          "file": "AGENTS.md",
+          "section": "Agents",
+          "slug": "agents-md"
+        }
+      ]
+    },
+    {
+      "id": "grandstack-agents",
+      "blurb": "How agents work with GraphQL: a small MCP server that runs GraphQL statements, a direct agent loop, auth example code and guardrails.",
+      "pages": [
+        {
+          "file": "README.md",
+          "section": "Start",
+          "slug": "index"
+        },
+        {
+          "file": "docs/how-it-works.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/schema-design-for-agents.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/mcp-server.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/direct-graphql.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/agent-loop.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/adding-auth.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/guardrails.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/recipes.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/testing.md",
+          "section": "Help"
+        },
+        {
+          "file": "docs/troubleshooting.md",
+          "section": "Help"
+        },
+        {
+          "file": "AGENTS.md",
+          "section": "Agents",
+          "slug": "agents-md"
+        }
+      ]
+    },
+    {
+      "id": "grandstack-federation",
+      "blurb": "Federation: the server as a subgraph, a Wikipedia subgraph, and a gateway that serves one combined API.",
+      "pages": [
+        {
+          "file": "README.md",
+          "section": "Start",
+          "slug": "index"
+        },
+        {
+          "file": "docs/how-it-works.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/subgraphs.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/prototype-findings.md",
+          "section": "Concepts"
+        },
+        {
+          "file": "docs/linking.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/composition.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/recipes.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/exercise-show-wikipedia-in-grandstack-web.md",
+          "section": "Guides"
+        },
+        {
+          "file": "docs/testing.md",
+          "section": "Help"
+        },
+        {
+          "file": "docs/troubleshooting.md",
+          "section": "Help"
+        },
+        {
+          "file": "AGENTS.md",
+          "section": "Agents",
+          "slug": "agents-md"
+        }
+      ]
+    }
+  ],
+  "roadmap": {
+    "repo": "grandstack",
+    "file": "docs/roadmap.md"
+  }
+}

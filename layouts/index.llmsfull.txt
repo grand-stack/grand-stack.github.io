@@ -1,0 +1,18 @@
+# GRANDstack: full documentation
+
+> GraphQL on Neo4j, for developers and agents. This file concatenates the documentation of every repository in the project (Apache-2.0). Index: {{ "llms.txt" | absURL }}.
+{{ range hugo.Data.docs.repos }}
+{{- range .pages }}
+{{- $path := strings.TrimSuffix "/" (strings.TrimPrefix "/" .url) }}
+{{- with site.GetPage $path }}
+
+---
+
+# {{ .Params.repo }}: {{ .Title }}
+
+URL: {{ .Permalink }}
+
+{{ .RawContent }}
+{{- end }}
+{{- end }}
+{{- end }}

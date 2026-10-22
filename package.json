@@ -1,0 +1,16 @@
+{
+  "name": "grand-stack-github-io",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "The GRANDstack website (grandstack.ai): a Hugo site with its own theme",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "sync": "node scripts/sync-docs.mjs",
+    "sync:check": "node scripts/sync-docs.mjs --check",
+    "dev": "hugo server",
+    "build": "hugo --gc --minify",
+    "check": "node scripts/check-site.mjs",
+    "verify-examples": "node scripts/verify-examples.mjs"
+  }
+}

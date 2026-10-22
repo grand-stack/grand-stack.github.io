@@ -1,0 +1,72 @@
+{{ define "main" }}
+{{- $org := site.Params.githubOrg }}
+<section class="hero">
+  <div class="wrap">
+    <span class="badge"><b>{{ hugo.Data.versions.grandstack }}</b> open source · Apache-2.0</span>
+    <h1>GraphQL on Neo4j, <em>for developers and agents.</em></h1>
+    <p class="lede">A Neo4j graph, a GraphQL API generated from one schema file, a typed React app, and an MCP server so agents can use the same API. Small repos you can clone, run in Docker, and change.</p>
+    <div>
+      <div class="tabs" role="tablist" aria-label="Setup" data-tabs>
+        <button class="tab" role="tab" id="t-default" aria-controls="p-default" aria-selected="true">default</button>
+        <button class="tab" role="tab" id="t-agents" aria-controls="p-agents" aria-selected="false">+ agents</button>
+        <button class="tab" role="tab" id="t-federation" aria-controls="p-federation" aria-selected="false">+ federation</button>
+        <button class="tab" role="tab" id="t-auth" aria-controls="p-auth" aria-selected="false">+ auth</button>
+      </div>
+      <div class="tab-panel" id="p-default" role="tabpanel" aria-labelledby="t-default"><div class="cmd"><pre><code>docker compose up --build</code></pre><button class="copy" type="button">copy</button></div></div>
+      <div class="tab-panel" id="p-agents" role="tabpanel" aria-labelledby="t-agents" hidden><div class="cmd"><pre><code>docker compose -f compose.yaml -f compose.agents.yaml up --build</code></pre><button class="copy" type="button">copy</button></div></div>
+      <div class="tab-panel" id="p-federation" role="tabpanel" aria-labelledby="t-federation" hidden><div class="cmd"><pre><code>docker compose -f compose.yaml -f compose.federation.yaml up --build</code></pre><button class="copy" type="button">copy</button></div></div>
+      <div class="tab-panel" id="p-auth" role="tabpanel" aria-labelledby="t-auth" hidden><div class="cmd"><pre><code>docker compose -f compose.yaml -f compose.auth.yaml up --build</code></pre><button class="copy" type="button">copy</button></div></div>
+      <p class="hint">run in the grandstack repo, with its sibling repos beside it · <a href="/quickstart/">full quickstart</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quickstart">
+  <div class="wrap">
+    <div class="kicker">quickstart</div>
+    <h2 class="title">From zero to a running graph API.</h2>
+    <p class="sub">You need Docker or Podman with compose, and Node 22 or later for the examples. Everything runs on your machine.</p>
+    <div class="grid two">
+      <div class="card step"><span class="n">1</span><h3>Clone the repos side by side</h3><p>The umbrella repo holds the compose files; the others are built from its sibling folders.</p>
+<pre><code>git clone https://github.com/{{ $org }}/grandstack
+git clone https://github.com/{{ $org }}/grandstack-server
+git clone https://github.com/{{ $org }}/grandstack-web</code></pre></div>
+      <div class="card step"><span class="n">2</span><h3>Start the stack</h3><p>Neo4j, the GraphQL server (with 152 films and 464 people loaded) and the web app.</p>
+<pre><code>cd grandstack
+cp .env.example .env
+docker compose up --build</code></pre></div>
+      <div class="card step"><span class="n">3</span><h3>Open the app</h3><p>Search, filter, compare, and edit films and people at <a href="http://localhost:3000">localhost:3000</a>. The GraphQL endpoint and GraphiQL are at <a href="http://localhost:4000/graphql">localhost:4000/graphql</a>.</p></div>
+      <div class="card step"><span class="n">4</span><h3>Query the API</h3><p>Any GraphQL client works; curl will do.</p>
+<pre><code>curl -s localhost:4000/graphql -H 'content-type: application/json' \
+  -d '{"query":"{ moviesConnection { totalCount } }"}'</code></pre></div>
+      <div class="card step"><span class="n">5</span><h3>Let an agent use it</h3><p>Add the MCP server (read-only by default) and connect Claude Code.</p>
+<pre><code>docker compose -f compose.yaml -f compose.agents.yaml up --build
+claude mcp add --transport http grandstack http://localhost:4100/mcp</code></pre></div>
+      <div class="card"><h3>Then go further</h3><p>Add login, federate Wikipedia data into the graph, or build your own app on your own data.</p><a class="more" href="/docs/">Read the docs →</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="inside">
+  <div class="wrap">
+    <div class="kicker">what is inside</div>
+    <h2 class="title">Small repos, one per level.</h2>
+    <p class="sub">Use one, or all. Each has its own docs, tests and agent guide.</p>
+    <div class="grid repo-list">
+      {{- range hugo.Data.docs.repos }}
+      <a class="card" href="/docs/{{ .id }}/"><h3>{{ .id }}</h3><p>{{ .blurb }}</p><span class="more">Docs →</span></a>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="architecture">
+  <div class="wrap">
+    <div class="kicker">architecture</div>
+    <h2 class="title">One schema file, three kinds of client.</h2>
+    <p class="sub">The web app, coding agents and agentic apps all use the same GraphQL API. Auth, agents and federation are opt-in layers.</p>
+    <div class="figure" style="max-width:62rem;margin:0 auto"><img src="/diagrams/grandstack/system-overview.svg" alt="System overview: the web app and agents call the GraphQL server, which reads and writes Neo4j. The numbered notes are on the architecture page." width="1000" height="560"></div>
+    <p class="sub" style="margin-top:1.2rem"><a href="/docs/grandstack/architecture/">Read the architecture notes →</a></p>
+  </div>
+</section>
+{{ end }}

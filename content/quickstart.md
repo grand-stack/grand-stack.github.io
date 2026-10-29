@@ -24,7 +24,8 @@ The optional layers each need their own repository beside these. Clone them when
 ```sh
 git clone https://github.com/grand-stack/grandstack-agents       # step 4
 git clone https://github.com/grand-stack/grandstack-auth         # step 5, login
-git clone https://github.com/grand-stack/grandstack-federation   # step 5, federation
+git clone https://github.com/grand-stack/grandstack-federation   # step 5, federation, and step 6
+git clone https://github.com/grand-stack/grandstack-web-aura       # step 6, managing Neo4j Aura
 ```
 
 ## 2. Start the default stack
@@ -79,6 +80,17 @@ docker compose -f compose.yaml -f compose.federation.yaml up --build
 ```
 
 Read [the auth docs](/docs/grandstack-auth/) and [the federation docs](/docs/grandstack-federation/) before relying on either.
+
+## 6. Manage Neo4j Aura
+
+A different app on the same pieces: a web UI for managing Neo4j Aura. The same server image serves an Aura graph model instead of Movies, an Aura subgraph syncs your account into it and applies changes you have reviewed and confirmed, and the federation gateway composes the two. It needs `grandstack-federation` and `grandstack-web-aura` beside the others, and a key that seals your Aura client secret:
+
+```sh
+(cd ../grandstack-web-aura && scripts/init-env.sh)       # writes SECRET_KEY into .env
+docker compose -f compose.yaml -f compose.aura.yaml up --build
+```
+
+It talks to the **real Aura API** with the client ID and secret you enter in the app at http://localhost:3000, so a change you confirm changes your account. Add `-f compose.aura-mock.yaml` to try it against a fake Aura (`mock-client` / `mock-secret`) first. It replaces the other setups on ports 3000 and 4000. Read [the Aura docs](/docs/grandstack-web-aura/), and the real-account checklist, before using a real account.
 
 ## What next
 

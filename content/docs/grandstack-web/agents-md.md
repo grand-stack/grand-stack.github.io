@@ -19,6 +19,7 @@ React + Vite client for grandstack-server: faceted movie and people search, comp
 - Before you finish: `npm run typecheck && npm test && npm run docs:check`. With a freshly seeded stack also `npm run e2e`.
 
 ## Rules that are easy to get wrong
+- **Build on the blocks; do not make a silo.** A new repository or setup must be made from what GRANDstack already provides (the `grandstack-server` image and its models, the `grandstack-federation` gateway, `grandstack-auth`, `grandstack-agents`, compose overlays in the `grandstack` repository), and improve a block when it falls short rather than copying or working around it. Read [building on GRANDstack](/docs/grandstack/building-on-grandstack/) before creating a repository, a compose file, a server, a gateway or a docs structure. Providing building blocks that people shape into their own solution is a goal of the project.
 - Write operations with `graphql()` from `src/graphql/generated`; never edit that folder by hand. Operation names must be unique across the app.
 - Filters live in the URL ([docs/architecture.md](/docs/grandstack-web/architecture/#data-flow)). Text inputs that write to the URL need local state plus a debounce.
 - Clearing filters: add new fields to `emptyFilters` with an explicit `undefined`, or `{ ...filters, ...emptyFilters }` will not clear them.

@@ -30,7 +30,7 @@ docker run --rm -p 4000:4000 \
 
 `host.docker.internal` reaches a Neo4j running on your own machine. Under Podman `host.containers.internal` is the equivalent alias. Make sure it is the Neo4j you mean: if more than one Neo4j listens on port 7687 you can reach the wrong one and get an authentication error.
 
-The bundled Movies seed loads into an empty database on first start. See [configuration](/docs/grandstack-server/configuration/) for every setting, including how to use your own schema and data.
+The bundled Movies seed loads into an empty database on first start. See [configuration](/docs/grandstack-server/configuration/) for every setting, including how to use your own schema and data, and how `MODEL` selects a different model (only one runs at a time) and `READ_ONLY` removes every mutation.
 
 ## Documentation
 
@@ -41,7 +41,7 @@ The bundled Movies seed loads into an empty database on first start. See [config
 | [Schema reference](/docs/grandstack-server/schema-reference/) | Every type and field in the current schema (generated) |
 | [Mutations](/docs/grandstack-server/mutations/) | Create, update and delete, relationship diffs, the counts plugin |
 | [Seeding](/docs/grandstack-server/seeding/) | Seed format, versioning, using your own data |
-| [Configuration](/docs/grandstack-server/configuration/) | Environment variables, files, image, releases |
+| [Configuration](/docs/grandstack-server/configuration/) | Environment variables, models, read-only mode, files, image, releases |
 | [Recipes](/docs/grandstack-server/recipes/) | Step-by-step common changes |
 | [Troubleshooting](/docs/grandstack-server/troubleshooting/) | Errors we hit and their fixes |
 

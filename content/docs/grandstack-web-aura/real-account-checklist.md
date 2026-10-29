@@ -20,6 +20,13 @@ The app talks to the real Aura API by default. Its tests run against `mock-aura`
 - The app's create form reads only the chosen tenant's options (a real tenant offers about three thousand), and the edge compresses reads, so that read is about 66 kB.
 - **Not done on the real account**: any create, rename, pause, resume or delete. Those cost money or change something, and need a go-ahead each time.
 
+## Not yet checked against real Aura
+
+- **The timings of a change.** The app knows the 13 statuses in the spec, and treats any other as "in progress". How long a create, resize, pause or delete really takes is not known here. `OPERATION_TIMEOUT_MS` defaults to 30 minutes.
+- **What PATCH answers.** The app handles 200 (applied) and 202 (carried out in the background). Whether a resize and a rename in one request behave as the fake does is untested.
+- **Rate limits.** The client honours `Retry-After` and pauses all requests after a 429, but the real limit, and how a sync of many instances fares, have not been seen. `SYNC_CONCURRENCY` (default 3) is a guess.
+- **Neo4j version.** Aura's instance details do not carry it, so only instances created here record one.
+- **Real phones.** The app has been checked in a headless Chrome at 390 px, with touch emulation. It has not been tried on an iPhone or an Android phone: tap targets, the on-screen keyboard over the delete confirmation, and the home screen's safe areas.
 
 ## A first run, safely
 

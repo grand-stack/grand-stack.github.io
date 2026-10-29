@@ -124,6 +124,7 @@ It talks to the **real Aura API** with the client ID and secret you enter in the
 | --- | --- |
 | [Architecture](/docs/grandstack/architecture/) | Components, data model, request flow, why things are built this way |
 | [Build your own app](/docs/grandstack/build-your-own-app/) | A verified walkthrough: new schema and data, a typed front end |
+| [Building on GRANDstack](/docs/grandstack/building-on-grandstack/) | Adding a repository or setup from the building blocks rather than beside them: the rule, a checklist, the warning signs of a silo |
 | [Agent guide](/docs/grandstack/agents/) | For coding agents: where to change what, checks, gotchas |
 | [Configuration](/docs/grandstack/configuration/) | Services, ports, settings (including the auth setup), Podman, resetting data |
 | [Versioning and releases](/docs/grandstack/versioning-and-releases/) | Tags, what is released, how to cut a release |

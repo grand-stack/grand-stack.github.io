@@ -15,6 +15,11 @@
           "section": "Concepts"
         },
         {
+          "url": "/docs/grandstack/building-on-grandstack/",
+          "title": "Building on GRANDstack, not beside it",
+          "section": "Concepts"
+        },
+        {
           "url": "/docs/grandstack/build-your-own-app/",
           "title": "Build your own app",
           "section": "Guides"

@@ -1,7 +1,7 @@
 ---
 title: "Versioning and releases"
 description: "Every repository uses semantic versions as git tags (v0.6.0). A change that adds behaviour bumps the minor version while we are below 1.0; a fix or a docs-only change..."
-weight: 7
+weight: 8
 repo: "grandstack"
 section: "Project"
 source: "docs/versioning-and-releases.md"
@@ -23,6 +23,7 @@ Every repository uses **semantic versions as git tags** (`v0.6.0`). A change tha
 | `grandstack-auth` | `v0.1.4` | v0.1.4: workflows. v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1: annotated diagrams (docs only). v0.1.0: gateway, Keycloak dev realm, auth schema rules, demo client, smoke and browser tests, the exercise and its reference patch (made against `grandstack-web` v0.5.0) |
 | `grand-stack.github.io` | `v0.1.3` | v0.1.3: `site.yml` (rebuild on every release), tag resolver, CI. v0.1.2: title "GraphQL and Neo4j", roadmap page removed from the site, copyright headers. v0.1.1: fixes after cold reads (diagram links, checker, quickstart, README). v0.1.0: | The website (https://www.grandstack.ai): hand-written Hugo theme, a generated copy of every repo's docs, examples verified against real stacks, llms.txt and llms-full.txt, Apache-2.0 |
 | `grandstack-federation` | `v0.1.4` | v0.1.4: docs note on setup order, workflows. v0.1.3: copyright headers on code files. v0.1.2: LICENSE and NOTICE. v0.1.1 and earlier: | v0.1.1: docs fixes after cold reads. v0.1.0: Wikipedia subgraph, gateway config and supergraph, link builder and committed links, smoke script, docs and diagrams |
+| `grandstack-web-aura` | not released yet | Built on the `aura-model` branches of this repository, `grandstack-server` (which gains `MODEL` and `READ_ONLY`) and `grandstack-federation`; its first release waits on a `grandstack-server` release. |
 | `grandstack-agents` | `v0.1.5` | v0.1.5: workflows. v0.1.4: copyright headers on code files. v0.1.3: LICENSE and NOTICE. v0.1.2 and earlier: | v0.1.2: `@cypher` in the schema design docs. v0.1.1: docs on schema design for agents. v0.1.0: MCP server (stdio and streamable HTTP) with generic GraphQL tools, read-only by default; direct agent-loop example; auth example code; docs and diagrams; Dockerfile |
 | `.github` | `v1.1.1` (`v1`) | Shared reusable workflows (CI, release, release button, CodeQL, dependency review), scripts, org profile and community files |
 | `grandstack` | `v0.10.4` | v0.10.4: releasing guide corrected after an independent review of the workflows. v0.10.3: GitHub workflows (CI, release, nightly integration), `scripts/integration.sh`, releasing guide. v0.10.2: copyright headers on code files (`scripts/add-headers.mjs`), NOTICE copyright is Neo4j. v0.10.1: docs refresh (README versions, roadmap row). v0.10.0: LICENSE (Apache-2.0) and NOTICE in every repo, roadmap (phase 7 done), pointers to the website. v0.9.1: versions table. v0.9.0: `compose.federation.yaml`, roadmap (phase 6 done, site is phase 7), docs. v0.8.2: table update. v0.8.1: docs pointers to schema design for agents. v0.8.0: `compose.agents.yaml` (opt-in agents MCP server), roadmap re-cut, docs. v0.7.1: annotated diagrams. v0.7.0: `compose.auth.yaml` (opt-in auth), docs |

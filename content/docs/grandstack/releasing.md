@@ -1,7 +1,7 @@
 ---
 title: "Releasing, CI and the website"
 description: "How code is checked, how a release is made, and how every release reaches grandstack.ai. All of it runs as GitHub Actions in the grand-stack organisation. The shared..."
-weight: 8
+weight: 9
 repo: "grandstack"
 section: "Project"
 source: "docs/releasing.md"
@@ -24,6 +24,7 @@ Each repository's `ci.yml` runs on pull requests and on pushes to `main`:
 | `grandstack-web` | typecheck, tests, docs check, build, Docker build |
 | `grandstack-auth` | typecheck and tests for the gateway and the client (and the client build), docs check, Docker builds |
 | `grandstack-agents`, `grandstack-federation` | typecheck, tests, build, docs check, Docker build(s) |
+| `grandstack-web-aura` | typecheck, docs check, audit, tests (the integration tests run against a Neo4j and a built `grandstack-server`), then the whole setup from `compose.aura.yaml` with the fake Aura: the committed supergraph is current, a real Chrome drives the app, and the TLS and sign-in edge keeps its promises |
 | `grandstack` (this repo), `.github` | the docs link check (`.github`: its script tests and a workflow lint) |
 | `grand-stack.github.io` | the site's unit tests, a build, and the site checks on the committed docs copy |
 
@@ -51,6 +52,7 @@ Versions are semantic (`vMAJOR.MINOR.PATCH`) git tags, and the tag must equal th
 | `grandstack-auth` | `grandstack-auth-gateway`, `grandstack-auth-client` |
 | `grandstack-agents` | `grandstack-agents-mcp` |
 | `grandstack-federation` | `grandstack-federation-wikipedia`, `grandstack-federation-gateway` |
+| `grandstack-web-aura` | `grandstack-web-aura-subgraph`, `grandstack-web-aura-mock`, `grandstack-web-aura-web`, `grandstack-web-aura-edge` |
 
 The web and auth-client images carry the URLs they were built with (`VITE_GRAPHQL_URL` and the OIDC settings point at `localhost`), so a published image fits the default local setup only; to use another address, build from source with build arguments. `docker compose` still builds from the sibling folders: pinning compose to published image tags is a later step.
 
@@ -72,7 +74,7 @@ A release of the website repository itself is not needed: it deploys on every pu
 
 ## The nightly integration test
 
-`integration.yml` (this repository) runs at night, after any release, and by hand. For each of `default`, `agents`, `auth` and `federation` it checks out the latest `main` of every repository, starts that compose setup, runs its checks, and tears it down:
+`integration.yml` (this repository) runs at night, after any release, and by hand. For each of `default`, `agents`, `auth`, `federation` and `aura` it checks out the latest `main` of every repository, starts that compose setup, runs its checks, and tears it down:
 
 | Setup | Checks |
 | --- | --- |
@@ -80,6 +82,7 @@ A release of the website repository itself is not needed: it deploys on every pu
 | agents | `grandstack-agents`' live and container checks, the agents examples |
 | auth | `grandstack-auth`'s smoke and browser checks, the auth example |
 | federation | `grandstack-federation`'s smoke test and the federation examples (live Wikipedia: a failure here is reported but does not fail the run) |
+| aura | `grandstack-web-aura`'s browser end-to-end checks, against the fake Aura (`compose.aura-mock.yaml`), never a real account |
 
 The logic is a script, so you can run any setup yourself, beside the other repositories: `scripts/integration.sh agents`. (On a Mac with Podman, set `DOCKER_HOST` to the machine socket first.) Running it already found a real bug: the federation links were applied before the seed on a fresh database, so the first start had none. The server now runs `SETUP_CYPHER_PATHS` after the seed.
 

@@ -1,7 +1,7 @@
 ---
 title: "Agent guide"
 description: "For coding agents (Claude Code or any other) and the people directing them. It says what the system is, where to change what, how to verify, and what goes wrong. It..."
-weight: 5
+weight: 6
 repo: "grandstack"
 section: "Agents"
 source: "docs/agents.md"
@@ -26,6 +26,10 @@ For coding agents (Claude Code or any other) and the people directing them. It s
 ## Notes on setup
 
 `npm ci` prints `npm warn install-scripts ... approve` warnings; they are harmless. The package versions in `package.json` match the git tags.
+
+## Adding a repository or a setup: build on the blocks
+
+GRANDstack exists to give people building blocks to shape into their own solution. Before you create a repository, a compose file, a server, a gateway or a docs structure, read [building on GRANDstack](/docs/grandstack/building-on-grandstack/): use the `grandstack-server` image (with a model, or its schema and setup settings), the `grandstack-federation` gateway image (with your own config files), `grandstack-auth` and `grandstack-agents`, and put the compose file in this repository as an overlay. If a block falls short, improve the block (generically, on a branch, with tests and docs) instead of copying it. Only what is genuinely new belongs in the new repository. The page has a checklist and the warning signs of a silo.
 
 ## Where to change what
 

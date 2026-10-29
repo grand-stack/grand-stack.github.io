@@ -142,6 +142,7 @@ The default stack above is open. Adding `compose.auth.yaml` puts a gateway in fr
 
 ## Design decisions and why
 
+- **Building blocks, not products.** Each repository does one job (the server image, the gateway, auth, agents, the web app, the compose files) so people can combine them into their own solution. A new setup is built from these blocks and improves them when they fall short; it does not copy them. See [building on GRANDstack](/docs/grandstack/building-on-grandstack/).
 | Decision | Reason |
 | --- | --- |
 | Generate the API from a schema file with `@neo4j/graphql` rather than writing resolvers | The schema is the single description of the API, which is easy for people and agents to read and change; filters, sorting and nested writes come for free. |

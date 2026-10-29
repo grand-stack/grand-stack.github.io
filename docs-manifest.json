@@ -16,6 +16,10 @@
           "section": "Concepts"
         },
         {
+          "file": "docs/building-on-grandstack.md",
+          "section": "Concepts"
+        },
+        {
           "file": "docs/build-your-own-app.md",
           "section": "Guides"
         },

@@ -1,7 +1,7 @@
 ---
 title: "Build your own app"
 description: "This guide takes the GRANDstack repos and turns them into an app for your own data. The worked example is a small library: Books, Authors and Genres, with a..."
-weight: 3
+weight: 4
 repo: "grandstack"
 section: "Guides"
 source: "docs/build-your-own-app.md"
@@ -291,6 +291,9 @@ npm run dev          # http://localhost:3000
 You should see six book cards with generated posters, authors with their roles and genres. (The dev server uses port 3000, which the server allows by default through `CORS_ORIGIN`.)
 
 ## Where to go next
+
+If you are turning this into a separate repository or a new setup of your own, read [building on GRANDstack](/docs/grandstack/building-on-grandstack/) first: it says how to build on the server, gateway and compose files instead of copying them.
+
 
 Use the web repo's `docs/recipes.md` for the patterns, adapted to your entities:
 

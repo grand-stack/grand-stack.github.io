@@ -1,7 +1,7 @@
 ---
 title: "Configuration"
 description: "How the stack is wired and every setting that matters, with pointers to the repo that owns each one."
-weight: 4
+weight: 5
 repo: "grandstack"
 section: "Reference"
 source: "docs/configuration.md"

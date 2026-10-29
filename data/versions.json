@@ -4,5 +4,6 @@
   "grandstack-web": "v0.5.6",
   "grandstack-auth": "v0.1.6",
   "grandstack-agents": "v0.1.8",
-  "grandstack-federation": "v0.1.6"
+  "grandstack-federation": "v0.1.6",
+  "grandstack-web-aura": "unreleased"
 }

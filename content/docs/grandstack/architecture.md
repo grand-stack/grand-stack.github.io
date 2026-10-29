@@ -37,6 +37,8 @@ This guide describes what is built today (the versions that were tested together
 | `grandstack-server` | The GraphQL server image | `docs/` in that repo |
 | `grandstack-web` | The React app (open, no login) | `docs/` in that repo |
 | `grandstack-auth` | Optional: gateway, Keycloak dev realm, auth rules, demo client | `docs/` in that repo |
+| `grandstack-federation` | Optional: gateway and supergraph, Wikipedia subgraph | `docs/` in that repo |
+| `grandstack-web-aura` | Optional: a web UI for managing Neo4j Aura (the Aura model, subgraph, web app, fake Aura, edge) | `docs/` in that repo |
 
 ## Data model (the sample)
 
@@ -126,6 +128,17 @@ The default stack above is open. Adding `compose.auth.yaml` puts a gateway in fr
 - A film or person with no link returns `wikipedia: null` with no error; Wikipedia trouble returns `null` with an error and the Neo4j fields still arrive.
 - Open, like the default stack: combining it with auth is not built.
 - Details: the `grandstack-federation` repository's `docs/how-it-works.md`.
+
+## Aura management (opt-in)
+
+`compose.aura.yaml` replaces the Movies app with a web UI for managing Neo4j Aura, built from the pieces above rather than beside them. It is the second example (after federation) of the same server image serving a different schema.
+
+- **The store is `grandstack-server`**, run with `MODEL=aura` (the model, a schema and setup Cypher, is mounted from `grandstack-web-aura/models`). It runs **twice**: once with `READ_ONLY=true`, a federation subgraph that the gateway and the web app read through, and once writable, on a private network, for the Aura subgraph only. `MODEL` holds one name, so one model runs per server; the Aura setup uses its own Neo4j volume so Movies and Aura data never mix.
+- **The gateway is `grandstack-federation`'s image**, with the Aura setup's own `supergraph.graphql` and gateway config mounted over its own, composing the read-only server and an **Aura subgraph** (custom code in `grandstack-web-aura`, like the Wikipedia subgraph).
+- **The web app is its own web server**, which serves the app and forwards `/graphql` to the gateway, so the browser talks to one origin.
+- **The real Aura API is the default.** For development and tests, `compose.aura-mock.yaml` adds a fake (`mock-aura`, checked against Aura's own OpenAPI file) and fixes the address to it, so a test cannot reach a real account.
+- Everything is published on this machine only, with no sign-in. `compose.aura-edge.yaml` adds TLS, a sign-in and rate limits in front and publishes nothing else.
+- Details, diagrams and the rules for changing things: the `grandstack-web-aura` repository's `docs/architecture.md`.
 
 ## Design decisions and why
 

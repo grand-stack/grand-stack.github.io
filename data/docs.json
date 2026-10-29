@@ -335,6 +335,57 @@
           "section": "Agents"
         }
       ]
+    },
+    {
+      "id": "grandstack-web-aura",
+      "blurb": "A mobile-friendly web UI for managing Neo4j Aura: the Aura graph model for the server, an Aura subgraph, the web app, a fake Aura for tests, and an optional TLS and sign-in edge.",
+      "pages": [
+        {
+          "url": "/docs/grandstack-web-aura/",
+          "title": "Overview",
+          "section": "Start"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/architecture/",
+          "title": "Architecture of grandstack-web-aura",
+          "section": "Concepts"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/features/",
+          "title": "How the features work",
+          "section": "Concepts"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/customising/",
+          "title": "Customising",
+          "section": "Guides"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/recipes/",
+          "title": "Recipes",
+          "section": "Guides"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/deploying/",
+          "title": "Deploying",
+          "section": "Guides"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/real-account-checklist/",
+          "title": "Before using a real Aura account",
+          "section": "Guides"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/testing/",
+          "title": "Testing",
+          "section": "Help"
+        },
+        {
+          "url": "/docs/grandstack-web-aura/agents-md/",
+          "title": "AGENTS.md",
+          "section": "Agents"
+        }
+      ]
     }
   ]
 }

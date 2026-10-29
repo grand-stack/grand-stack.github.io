@@ -57,6 +57,9 @@ docker compose -f compose.yaml -f compose.auth.yaml up --build
 # with federation (Wikipedia summaries on films and people; needs internet): gateway :4000, subgraphs :4001 and :4010
 docker compose -f compose.yaml -f compose.federation.yaml up --build
 
+# with Aura management (a web UI for Aura, against the real Aura; add -f compose.aura-mock.yaml for a fake one; needs SECRET_KEY in .env): app :3000, gateway :4000
+docker compose -f compose.yaml -f compose.aura.yaml up --build
+
 # with an MCP server for agents: http://localhost:4100/mcp (read-only; AGENTS_ALLOW_MUTATIONS=true to write)
 docker compose -f compose.yaml -f compose.agents.yaml up --build
 ```

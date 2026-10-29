@@ -94,6 +94,17 @@ docker compose -f compose.yaml -f compose.federation.yaml up --build
 
 Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (the web app uses it unchanged) and the Neo4j subgraph on 4001. See [`grandstack-federation`](/docs/grandstack/architecture/#federation-opt-in). It replaces the default, auth and agents setups on port 4000; run one at a time.
 
+## Run it with Aura management
+
+Replaces the Movies app with a web UI for managing Neo4j Aura. The same server image serves an Aura graph model instead of Movies, an Aura subgraph syncs Aura's state into it and applies reviewed changes, and the federation gateway composes the two. Clone the extra repositories beside the others first (`grandstack-federation` and `grandstack-web-aura`), then make a key and start it from the `grandstack` folder:
+
+```sh
+(cd ../grandstack-web-aura && scripts/init-env.sh)       # writes SECRET_KEY into .env; seals the Aura client secret. Keep it.
+docker compose -f compose.yaml -f compose.aura.yaml up --build
+```
+
+It talks to the **real Aura API** with the client ID and secret you enter in the app, so a change you confirm changes your account. To try it without a real account, add `-f compose.aura-mock.yaml`, which starts a fake Aura (credentials `mock-client` / `mock-secret`) and fixes the address to it; that is for development and tests. The app is at http://localhost:3000 and the gateway at http://localhost:4000/graphql. It replaces the other setups on those ports, uses its own Neo4j volume so Movies and Aura data never mix, and publishes everything on this machine only. It has **no sign-in**: for TLS and a sign-in, which is the way to reach it from a phone, add `-f compose.aura-edge.yaml` (see [`grandstack-web-aura`](/docs/grandstack/architecture/#aura-management-opt-in)). It can delete databases, so read that repository's `docs/real-account-checklist.md` first.
+
 ## Repositories
 
 | Repository | What it is | Start with |
@@ -105,6 +116,7 @@ Needs internet (the Wikipedia part is live). The gateway is then on port 4000 (t
 | `grandstack-agents` | MCP server with generic GraphQL tools, a direct agent-loop example, and example code for using auth | its `README.md` and `docs/how-it-works.md` |
 | `grand-stack.github.io` | The website (https://www.grandstack.ai): Hugo, a generated copy of every repo's docs, examples, llms.txt | its `README.md` |
 | `grandstack-federation` | Wikipedia subgraph, gateway and supergraph, link builder; the server becomes a subgraph | its `README.md` and `docs/how-it-works.md` |
+| `grandstack-web-aura` | A web UI for managing Neo4j Aura: the Aura graph model for the server, an Aura subgraph, a fake Aura, the web app, an optional TLS and sign-in edge | its `README.md` and `docs/architecture.md` |
 
 ## Documentation
 

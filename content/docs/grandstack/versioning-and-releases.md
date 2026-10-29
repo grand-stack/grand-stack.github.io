@@ -43,7 +43,7 @@ Before releasing, the checks that CI runs can be run locally:
 - server: `npm run lint && npm test && npm run schema:check && npm run docs:check`
 - web: `npm run typecheck && npm test && npm run docs:check`, and with a freshly seeded stack `npm run e2e`
 - auth: unit tests in `gateway/` and `client/`, `npm run docs:check`, `npm run verify-exercise`, and with the auth stack running `npm run smoke` and `npm run e2e`
-- all four compose setups: `scripts/integration.sh default|agents|auth|federation` (in this repository)
+- all five compose setups: `scripts/integration.sh default|agents|auth|federation|aura` (in this repository)
 
 If the server schema changed, run `npm run docs:schema` and commit the updated reference. Update the table above when a release changes what was tested together.
 
